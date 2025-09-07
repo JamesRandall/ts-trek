@@ -1,0 +1,1 @@
+// Intentionally left empty to ensure TSX test discovery; actual tests are in MenuButton.test.tsx
