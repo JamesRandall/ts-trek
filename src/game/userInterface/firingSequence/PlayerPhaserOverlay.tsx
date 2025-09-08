@@ -20,10 +20,10 @@ export function PlayerPhaserOverlay({cellSize} : { cellSize: { width: number, he
 
     if (!firingItem || firingItem.type !== FiringSequenceActionType.Phasers || !targetObject) return undefined;
 
-    const radius = cellSize.width * 0.16894531; // this is the radius of the laser saucer expressed as a percentage of the cell size
+    const radius = cellSize.width * (347/1024); // this is the radius of the laser saucer expressed as a percentage of the cell size
     const center = {
         x: player.position.sector.x * cellSize.width + cellSize.width / 2.0 - radius,
-        y: player.position.sector.y * cellSize.height + cellSize.height * 0.35316406 }; // this is the percentage from the top to the center of the saucer
+        y: player.position.sector.y * cellSize.height + cellSize.height * (416/1024) }; // this is the percentage from the top to the center of the saucer
     const source = { x: center.x + radius, y: center.y };
     const target = {
         x: targetObject.position.sector.x * cellSize.width + cellSize.width / 2.0,

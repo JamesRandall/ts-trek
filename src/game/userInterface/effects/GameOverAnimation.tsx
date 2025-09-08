@@ -311,8 +311,8 @@ async function domToCanvas(element: HTMLElement, width?: number, height?: number
             },
             // Use scroll position to ensure we capture the visible area
             // Types suggest x and y don't exist as properties but setting thm makes Safari work :shrug
-            x: window.pageXOffset || 0,
-            y: window.pageYOffset || 0,
+            //x: window.pageXOffset || 0,
+            //y: window.pageYOffset || 0,
         });
         return canvas;
 

@@ -12,7 +12,7 @@ function Main() {
     const navigate = useNavigate();
 
     return (<div className="absolute flex flex-col justify-center items-center z-20 left-0 top-0 right-0 bottom-0 gap-10">
-        <img src={starship} alt="" />
+        <img src={starship} alt="" style={{maxHeight: "50vh"}} />
         <div className="flex flex-col gap-3 items-center">
             <div className="grid grid-cols-3 gap-3">
                 <MenuButton title={"NEW GAME"} onClick={() => startGame()} disabled={assets.isLoading} />
