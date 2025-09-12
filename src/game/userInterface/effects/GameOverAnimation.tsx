@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { CanvasSurface } from "../../../components/CanvasSurface.tsx";
 import Starfield from './Starfield.tsx';
 import * as htmlToImage from 'html-to-image';
+import {useNavigate} from "react-router-dom";
 
 
 type Fragment = {
@@ -18,11 +19,21 @@ type Fragment = {
 };
 
 export function GameOverAnimation() {
+    const navigate = useNavigate();
     const [screenshot, setScreenshot] = useState<HTMLCanvasElement | null>(null);
     const [fragments, setFragments] = useState<Fragment[]>([]);
     const [animationStarted, setAnimationStarted] = useState(false);
     const [showStarfield, setShowStarfield] = useState(false);
+    const closeTimerHandle = useRef<number|null>(null);
     const animationStartTimeRef = useRef<number | null>(null); // Track when animation actually starts
+
+    const close = () => {
+        if (closeTimerHandle.current !== null) {
+            clearTimeout(closeTimerHandle.current);
+            closeTimerHandle.current = null;
+        }
+        navigate("/");
+    }
 
     // Capture the screen when the component mounts
     useEffect(() => {
@@ -75,6 +86,10 @@ export function GameOverAnimation() {
         };
 
         captureScreen();
+        if (closeTimerHandle.current !== null) {
+            clearTimeout(closeTimerHandle.current);
+        }
+        closeTimerHandle.current = setTimeout(close, 10000);
     }, []);
 
     // Generate fragments for explosion effect
@@ -245,7 +260,7 @@ export function GameOverAnimation() {
 
 
     return (
-        <div className="fixed inset-0 z-50">
+        <div className="fixed inset-0 z-50" onClick={close}>
             <style>{`
                 .starfield-fade-in {
                     animation: starfield-fade-in 3s ease-in forwards;

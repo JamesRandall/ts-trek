@@ -38,7 +38,6 @@ function getImpactedShield(state:GameStore, enemy: Enemy) : { label: string, shi
     } else {
         return { label: 'Port', shield: player.attributes.shields.port };
     }
-
 }
 
 export function applyPhasersToPlayer({set}: ContextAccessor) {
@@ -90,6 +89,9 @@ export function applyPhasersToPlayer({set}: ContextAccessor) {
                 }
             }
         }
+
+        // Handy if you want to test game over flows
+        //state.gameData.player.attributes.systems.hull.status.currentValue = 0.0;
     });
 }
 
