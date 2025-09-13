@@ -1,4 +1,3 @@
-import type { AssetManager } from "../AssetManager.tsx";
 import type {UniversePosition} from "./universePosition.ts";
 import {createRangedValue, type RangedValue} from "./RangedValue.ts";
 import {type GameObject, GameObjectType} from "./gameObject.ts";
@@ -26,8 +25,7 @@ export const createStarbase = (position: UniversePosition, starbaseNumber: numbe
         energy: createRangedValue(10000),
         torpedoStocks: createRangedValue(100)
     },
-    rotation: 0,
-    asset: (assetManager: AssetManager | null) => assetManager?.starbase ?? null
+    rotation: 0
 });
 
 const createStarbaseName = (starbaseNumber: number) => {

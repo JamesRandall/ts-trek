@@ -1,5 +1,5 @@
 import {create} from "zustand";
-import {devtools} from "zustand/middleware";
+import {devtools, persist} from "zustand/middleware";
 import {immer} from "zustand/middleware/immer";
 import {createNewGame} from "../models/gameFactory.ts";
 import {FiringSequenceActionType, type GameData} from "../models/gameData.ts";
@@ -28,6 +28,7 @@ import {
     repair,
     togglePrioritisedSystem
 } from "../actions/playerTurn/repair.ts";
+import {patchRangedValues} from "../models/RangedValue.ts";
 
 export const AiActorAction = {
     FirePhasers: 'FirePhasers',
@@ -122,6 +123,7 @@ export type ContextAccessor = {
 
 export const useGameStore = create<GameStore>()(
     devtools(
+        persist(
         immer((set, get) => ({
             gameData: createNewGame(),
             currentPath: '/',
@@ -208,5 +210,42 @@ export const useGameStore = create<GameStore>()(
                 applyPhasersToPlayer: () => applyPhasersToPlayer({get,set})
             }
         })),
+        {
+            name: 'ts-trek-game-store',
+            partialize: (state) => ({
+                gameData: state.gameData,
+                version: 1,
+                userInterface: {
+                    isDisabled: state.userInterface.isDisabled,
+                    showTipLog: state.userInterface.showTipLog,
+                    isShowingLongRangeScanner: state.userInterface.isShowingLongRangeScanner,
+                    isShowingSystemStatus: state.userInterface.isShowingSystemStatus,
+                    isShowingLogs: state.userInterface.isShowingLogs,
+                    isShowingMenu: state.userInterface.isShowingMenu,
+                    gameObjectRotations: state.userInterface.gameObjectRotations,
+                }
+            }),
+            onRehydrateStorage: () => {
+                return (state:any) => {
+                    if (state) {
+                        // Apply patching to the entire rehydrated state
+                        patchRangedValues(state);
+                    }
+                    return state;
+                }
+            },
+            merge: (persistedState:any, currentState:any) => {
+                // Merge persisted state with current state, preserving functions
+                return {
+                    ...currentState,
+                    ...persistedState,
+                    userInterface: {
+                        ...currentState.userInterface,
+                        ...persistedState.userInterface,
+                    }
+                };
+            }
+
+        })
     )
 );

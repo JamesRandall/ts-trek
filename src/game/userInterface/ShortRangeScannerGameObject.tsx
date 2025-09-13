@@ -1,4 +1,4 @@
-import type {GameObject} from "../models/gameObject.ts";
+import {type GameObject, getGameObjectAsset} from "../models/gameObject.ts";
 import {useAssets} from "../AssetManager.tsx";
 import {AiActorAction, useGameStore} from "../state/store.ts";
 import {FiringSequenceActionType} from "../models/gameData.ts";
@@ -167,7 +167,7 @@ export function ShortRangeScannerGameObject({showAsTarget, gameObject, size, onP
         }
         : scannerPosition;
 
-    const asset = gameObject.asset(assets);
+    const asset = getGameObjectAsset(gameObject, assets);
     const renderGameObject = (ctx: CanvasRenderingContext2D, state: { width: number; height: number, timestamp: number }) => {
         if (!asset) return;
 

@@ -1,4 +1,3 @@
-import type { AssetManager } from "../AssetManager.tsx";
 import type {UniversePosition} from "./universePosition.ts";
 import {type GameObject, GameObjectType} from "./gameObject.ts";
 import {createRangedValue, type RangedValue} from "./RangedValue.ts";
@@ -97,5 +96,4 @@ export const createPlayer = (position: UniversePosition, attributes: PlayerAttri
     position,
     attributes: {...attributes, targetQuadrant:{...position.quadrant} },
     rotation: 0,
-    asset: (assetManager: AssetManager | null) => assetManager?.player ?? null,
 })

@@ -1,6 +1,7 @@
 import type {UniversePosition} from "./universePosition.ts";
 import type {AssetManager} from "../AssetManager.tsx";
 import {arePositionsEqual as ape } from "./universePosition.ts";
+import {type Enemy, EnemyType} from "./Enemy.ts";
 
 export const GameObjectType = {
     Enemy: 'Enemy',
@@ -15,8 +16,23 @@ export interface GameObject {
     id: string;
     type: GameObjectType;
     position: UniversePosition;
-    asset: (assetManager: AssetManager | null) => HTMLImageElement | null;
     rotation: number;
+}
+
+export function getGameObjectAsset(gameObject: GameObject | null, assetManager: AssetManager | null) {
+    if (!gameObject || !assetManager) return null;
+    switch(gameObject.type) {
+        default: return null;
+        case GameObjectType.Starbase: return assetManager.starbase;
+        case GameObjectType.Star: return assetManager.star;
+        case GameObjectType.Player: return assetManager.player;
+        case GameObjectType.Enemy:
+            switch ((gameObject as Enemy).enemyType) {
+                case EnemyType.Cube: return assetManager.enemyCube;
+                case EnemyType.Scout: return assetManager.enemyScout;
+                case EnemyType.Warbird: return assetManager.enemyWarbird;
+            }
+    }
 }
 
 export function arePositionsEqual(obj1: GameObject, obj2: GameObject) {

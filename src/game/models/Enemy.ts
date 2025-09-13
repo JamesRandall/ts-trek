@@ -1,4 +1,3 @@
-import type { AssetManager } from "../AssetManager.tsx";
 import {createRangedValue, type RangedValue} from "./RangedValue.ts";
 import type {UniversePosition} from "./universePosition.ts";
 import {type GameObject, GameObjectType} from "./gameObject.ts";
@@ -32,14 +31,6 @@ const createEnemy = (position: UniversePosition, enemyType: EnemyType, attribute
     position,
     attributes,
     rotation: 0,
-    asset: (assetManager: AssetManager | null) => {
-        if (!assetManager) return null;
-        switch (enemyType) {
-            case EnemyType.Cube: return assetManager.enemyCube;
-            case EnemyType.Scout: return assetManager.enemyScout;
-            case EnemyType.Warbird: return assetManager.enemyWarbird;
-        }
-    },
     enemyType,
     title: title,
     phaserSource: enemyType === EnemyType.Scout ? [{x:200, y:420}, {x:824, y:420}] :
