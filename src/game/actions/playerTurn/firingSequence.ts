@@ -1,7 +1,7 @@
 import type {ContextAccessor, GameStore} from "../../state/store.ts";
 import type {Enemy} from "../../models/Enemy.ts";
 import type {Player} from "../../models/Player.ts";
-import {FiringSequenceActionType, GameState, type PlayerWeaponConstants} from "../../models/gameData.ts";
+import {FiringSequenceActionType, GameTurn, type PlayerWeaponConstants} from "../../models/gameData.ts";
 import {endTurn} from "./endTurn.ts";
 import {verifyState} from "../verifyState.ts";
 import {passTime} from "./time.ts";
@@ -63,7 +63,7 @@ function applyTorpedoHitToEnemy(constants: PlayerWeaponConstants, player: Player
 }
 
 export function nextFiringSequenceItem({get,set} : ContextAccessor) {
-    if (!verifyState(get, GameState.PlayerTurn)) { return; }
+    if (!verifyState(get, GameTurn.PlayerTurn)) { return; }
     set((state) => {
         const head = state.gameData.firingSequence[0];
         if (!head) {
@@ -105,7 +105,7 @@ export function nextFiringSequenceItem({get,set} : ContextAccessor) {
 }
 
 export function beginFiringSequence({get,set} : ContextAccessor, weapon: FiringSequenceActionType) {
-    if (!verifyState(get, GameState.PlayerTurn)) { return; }
+    if (!verifyState(get, GameTurn.PlayerTurn)) { return; }
     set((state) => {
         state.userInterface.isDisabled = true;
         const targets = state.gameData.player.attributes.weapons.targetGameObjectIds;

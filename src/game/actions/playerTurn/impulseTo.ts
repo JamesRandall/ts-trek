@@ -1,6 +1,6 @@
 import type {ContextAccessor, ReadonlyContextAccessor} from "../../state/store.ts";
 import {verifyState} from "../verifyState.ts";
-import {GameState} from "../../models/gameData.ts";
+import {GameTurn} from "../../models/gameData.ts";
 import type {UniversePosition} from "../../models/universePosition.ts";
 import {distanceBetween, objectAtPosition} from "../map.ts";
 import {endTurn} from "./endTurn.ts";
@@ -10,7 +10,7 @@ const isBlocked = (ctx: ReadonlyContextAccessor, universePosition: UniversePosit
     objectAtPosition(ctx, universePosition) !== undefined;
 
 export function impulseTo({ get, set}: ContextAccessor, sector:{x:number,y:number}) {
-    if (!verifyState(get, GameState.PlayerTurn)) { return; }
+    if (!verifyState(get, GameTurn.PlayerTurn)) { return; }
     const player = get().gameData.player;
     if (isBlocked({get}, { ...player.position, sector })) { return; }
 

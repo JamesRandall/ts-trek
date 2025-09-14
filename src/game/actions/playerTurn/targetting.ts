@@ -1,7 +1,7 @@
 import type {ContextAccessor, ReadonlyContextAccessor} from "../../state/store.ts";
 import type {GameObject} from "../../models/gameObject.ts";
 import {verifyState} from "../verifyState.ts";
-import {GameState} from "../../models/gameData.ts";
+import {GameTurn} from "../../models/gameData.ts";
 import {updateWeaponState} from "./firingSequence.ts";
 import * as GameConstants from "../../gameConstants.ts";
 
@@ -16,7 +16,7 @@ export function canAddTarget({ get }: ReadonlyContextAccessor) {
 }
 
 export function addTarget({ get, set }: ContextAccessor, target: GameObject, numberOfTimes?:number) {
-    if (!verifyState(get, GameState.PlayerTurn)) { return; }
+    if (!verifyState(get, GameTurn.PlayerTurn)) { return; }
     if (!canAddTarget({get})) { return; }
     set((state) => {
         for(let i = 0; i < (numberOfTimes ?? 1); i++) {
@@ -32,7 +32,7 @@ export function addTarget({ get, set }: ContextAccessor, target: GameObject, num
 }
 
 export function removeTarget({ get, set }: ContextAccessor, target: GameObject|number) {
-    if (!verifyState(get, GameState.PlayerTurn)) { return; }
+    if (!verifyState(get, GameTurn.PlayerTurn)) { return; }
     set((state) => {
         if (typeof target === "number") {
             const targetIndex = target;

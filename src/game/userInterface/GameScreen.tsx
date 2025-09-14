@@ -8,16 +8,18 @@ import { useEffect, useState } from "react";
 import {useGameStore} from "../state/store.ts";
 import {WarpingAnimation} from "./WarpingAnimation.tsx";
 import {EnemyAiControlLoop} from "./EnemyAiControlLoop.tsx";
-import {GameLogLevel, GameOverState} from "../models/gameData.ts";
+import {GameLogLevel, GameState} from "../models/gameData.ts";
 import {GameOverAnimation} from "./effects/GameOverAnimation.tsx";
+import {useNavigate} from "react-router-dom";
 
 export function GameScreen() {
     const [scale, setScale] = useState(1);
+    const navigate = useNavigate();
     const isWarping = useGameStore(state => state.gameData.isWarping);
     const showTipLog = useGameStore(state => state.userInterface.showTipLog);
     const hideTipLog = useGameStore(state => state.userInterface.hideTipLog);
     const logs = useGameStore(state => state.gameData.logs);
-    const gameOver = useGameStore(state => state.gameData.gameOver);
+    const gameState = useGameStore(state => state.gameData.gameState);
     const tipLog = logs[logs.length - 1];
     const [timerHandle, setTimerHandle] = useState<number | null>(null);
     const [isVisible, setIsVisible] = useState(false);
@@ -25,6 +27,12 @@ export function GameScreen() {
     
     const color = tipLog?.level === GameLogLevel.Red ? 'text-red-600' :
         tipLog?.level === GameLogLevel.Yellow ? 'text-yellow-600' : 'text-green-600';
+
+    useEffect(() => {
+        if (gameState === GameState.NoGame) {
+            navigate('/');
+        }
+    }, [gameState, navigate]);
 
     useEffect(() => {
         if (timerHandle) { clearTimeout(timerHandle); }
@@ -125,7 +133,7 @@ export function GameScreen() {
             </div>
 
             {isWarping && <WarpingAnimation /> }
-            {gameOver === GameOverState.Defeat && <GameOverAnimation /> }
+            {gameState === GameState.Defeat && <GameOverAnimation /> }
         </div>
     )
 }

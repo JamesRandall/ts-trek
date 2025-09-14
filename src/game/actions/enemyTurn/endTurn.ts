@@ -2,7 +2,7 @@ import type {ContextAccessor, GameStore} from "../../state/store.ts";
 import {applySensorDamage} from "../playerTurn/sensors.ts";
 import {beginPlayerTurn} from "../playerTurn/endTurn.ts";
 import {isPlayerDestroyed} from "../../models/Player.ts";
-import {GameOverState} from "../../models/gameData.ts";
+import {GameState} from "../../models/gameData.ts";
 
 export function endTurn({set}:ContextAccessor) {
     set(state => {
@@ -15,7 +15,7 @@ export function endTurn({set}:ContextAccessor) {
 export function endActorTurn(state : ContextAccessor | GameStore) {
     const applyChange = (gameState:GameStore) => {
         if (isPlayerDestroyed(gameState.gameData.player)) {
-            gameState.gameData.gameOver = GameOverState.Defeat;
+            gameState.gameData.gameState = GameState.Defeat;
             return;
         }
 

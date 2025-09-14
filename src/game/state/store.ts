@@ -2,7 +2,7 @@ import {create} from "zustand";
 import {devtools, persist} from "zustand/middleware";
 import {immer} from "zustand/middleware/immer";
 import {createNewGame} from "../models/gameFactory.ts";
-import {FiringSequenceActionType, type GameData} from "../models/gameData.ts";
+import {FiringSequenceActionType, type GameData, GameState} from "../models/gameData.ts";
 import {toggleShieldStatus} from "../actions/playerTurn/toggleShieldStatus.ts";
 import {impulseTo} from "../actions/playerTurn/impulseTo.ts";
 import type {GameObject} from "../models/gameObject.ts";
@@ -141,7 +141,7 @@ export const useGameStore = create<GameStore>()(
     devtools(
         persist(
         immer((set, get) => ({
-            gameData: createNewGame(),
+            gameData: { ...createNewGame(), gameState: GameState.NoGame },
             currentPath: '/',
             // Router
             setPath: (path:string) => set({currentPath: path}),

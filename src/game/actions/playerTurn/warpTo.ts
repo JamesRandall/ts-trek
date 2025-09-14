@@ -1,6 +1,6 @@
 import type {ContextAccessor, GameStore, ReadonlyContextAccessor} from "../../state/store.ts";
 import {verifyState} from "../verifyState.ts";
-import {type GameData, GameState, type WarpConstants} from "../../models/gameData.ts";
+import {type GameData, GameTurn, type WarpConstants} from "../../models/gameData.ts";
 import {objectsInQuadrant, quadrantDistance} from "../map.ts";
 import {endTurn} from "./endTurn.ts";
 import {passTime} from "./time.ts";
@@ -116,7 +116,7 @@ export function canWarpTo({ get }: ReadonlyContextAccessor, quadrant: {x:number,
 }
 
 export function beginWarpTo({ get, set}: ContextAccessor) {
-    if (!verifyState(get, GameState.PlayerTurn)) { return; }
+    if (!verifyState(get, GameTurn.PlayerTurn)) { return; }
     const energyDelta = calculateEnergyDelta(get().gameData);
     if (energyDelta + get().gameData.player.attributes.energy.currentValue < 0) {
         return;
@@ -128,7 +128,7 @@ export function beginWarpTo({ get, set}: ContextAccessor) {
 }
 
 export function endWarpTo({ get, set}: ContextAccessor) {
-    if (!verifyState(get, GameState.PlayerTurn)) { return; }
+    if (!verifyState(get, GameTurn.PlayerTurn)) { return; }
     set((state) => {
         const timeToTravel = calculateTimeToTravel(state.gameData);
         const energyDelta = calculateEnergyDelta(get().gameData);

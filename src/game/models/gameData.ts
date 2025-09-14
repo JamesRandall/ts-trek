@@ -3,12 +3,12 @@ import type {Starbase} from "./Starbase.ts";
 import type {Player} from "./Player.ts";
 import type {GameObject} from "./gameObject.ts";
 
-export const GameState = {
+export const GameTurn = {
     PlayerTurn: 'PlayerTurn',
     EnemyTurn: 'EnemyTurn'
 } as const;
 
-export type GameState = typeof GameState[keyof typeof GameState];
+export type GameTurn = typeof GameTurn[keyof typeof GameTurn];
 
 export const FiringSequenceActionType = {
     Phasers: 'Phasers',
@@ -26,13 +26,14 @@ export const GameLogLevel = {
 
 export type GameLogLevel = typeof GameLogLevel[keyof typeof GameLogLevel];
 
-export const GameOverState = {
-    No: 'no',
+export const GameState = {
+    NoGame: 'noGame',
+    InProgress: 'inProgress',
     Victory: 'victory',
     Defeat: 'defeat'
 } as const;
 
-export type GameOverState = typeof GameOverState[keyof typeof GameOverState];
+export type GameState = typeof GameState[keyof typeof GameState];
 
 export type GameLog = {
     message: string,
@@ -82,7 +83,7 @@ export type DifficultyConstants = {
 export type GameData = {
     difficultyConstants: DifficultyConstants;
     stardate: number;
-    state: GameState;
+    state: GameTurn;
     player: Player;
     stars: GameObject[];
     enemies: Enemy[];
@@ -93,7 +94,7 @@ export type GameData = {
     isWarping: boolean;
     logs: GameLog[];
     sensorImpactedGameObjectIds: string[];
-    gameOver: GameOverState;
+    gameState: GameState;
     canRepair: boolean;
     canFirePhasers: boolean;
     canFireTorpedoes: boolean;

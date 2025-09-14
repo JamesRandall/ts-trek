@@ -1,7 +1,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { canWarpTo, beginWarpTo, endWarpTo, setWarpSpeed } from './warpTo';
-import { GameState } from '../../models/gameData';
+import { GameTurn } from '../../models/gameData';
 import type { ContextAccessor, ReadonlyContextAccessor } from '../../state/store';
 
 // Mock the verifyState function
@@ -50,7 +50,7 @@ describe('warpTo functions', () => {
     beforeEach(() => {
         mockGameStore = {
             gameData: {
-                state: GameState.PlayerTurn,
+                state: GameTurn.PlayerTurn,
                 isWarping: false,
                 player: {
                     position: {
@@ -195,7 +195,7 @@ describe('warpTo functions', () => {
 
             expect(mockVerifyState).toHaveBeenCalledWith(
                 mockContextAccessor.get,
-                GameState.PlayerTurn
+                GameTurn.PlayerTurn
             );
         });
     });

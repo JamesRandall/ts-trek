@@ -5,9 +5,11 @@ import {useAssets} from "../AssetManager.tsx";
 import MenuButton from "../../components/MenuButton.tsx";
 import {Route, Routes, useNavigate} from "react-router-dom";
 import AboutScreen from "./about/AboutScreen.tsx";
+import {GameState} from "../models/gameData.ts";
 
 function Main() {
     const startGame = useGameStore(s => s.startGame);
+    const gameState = useGameStore(s => s.gameData.gameState);
     const assets = useAssets();
     const navigate = useNavigate();
 
@@ -16,7 +18,7 @@ function Main() {
         <div className="flex flex-col gap-3 items-center">
             <div className="grid grid-cols-3 gap-3">
                 <MenuButton title={"NEW GAME"} onClick={() => startGame()} disabled={assets.isLoading} />
-                <MenuButton title={"CONTINUE"} disabled={assets.isLoading} />
+                <MenuButton title={"CONTINUE"} onClick={() => navigate('/game')} disabled={assets.isLoading || gameState !== GameState.InProgress} />
                 <MenuButton title={"ABOUT"} onClick={() => navigate('/about')} disabled={assets.isLoading} />
             </div>
         </div>

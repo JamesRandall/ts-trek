@@ -3,7 +3,7 @@ import {createPlayer, playerAttributes} from "./Player.ts";
 import {uniqueRandomPositionFactory} from "./universePosition.ts";
 import {range} from "../utilities.ts";
 import {createStarbase} from "./Starbase.ts";
-import {type DifficultyConstants, type GameData, GameOverState, GameState} from "./gameData.ts";
+import {type DifficultyConstants, type GameData, GameState, GameTurn} from "./gameData.ts";
 import {createStar} from "./Star.ts";
 import * as GameConstants from '../gameConstants.ts';
 import {GameObjectType} from "./gameObject.ts";
@@ -53,7 +53,7 @@ export function createNewGame() : GameData {
     return {
         difficultyConstants: normalDifficultyConstants,
         stardate: 2509.1,
-        state: GameState.PlayerTurn,
+        state: GameTurn.PlayerTurn,
         player: createPlayer(
             playerPosition,
             playerAttributes()
@@ -75,7 +75,7 @@ export function createNewGame() : GameData {
         isWarping: false,
         logs: [],
         sensorImpactedGameObjectIds: [],
-        gameOver: GameOverState.No,
+        gameState: GameState.InProgress,
         // player status for buttons
         canRepair: false,
         canFirePhasers: false,
