@@ -54,4 +54,7 @@ export type GameData = {
     logs: GameLog[];
     sensorImpactedGameObjectIds: string[];
     gameOver: GameOverState;
+    canRepair: boolean;
+    canFirePhasers: boolean;
+    canFireTorpedoes: boolean;
 }

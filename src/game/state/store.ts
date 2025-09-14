@@ -95,9 +95,6 @@ export type GameStore = {
         prioritisedRepairCosts: () => number;
         nonPrioritisedRepairCosts: () => number;
         repair: (time: number) => void;
-        canRepair: boolean;
-        canFirePhasers: boolean;
-        canFireTorpedoes: boolean;
     },
     enemyTurn: {
         aiActorSequence: string[];
@@ -121,6 +118,25 @@ export type ContextAccessor = {
     set: (partial: Partial<GameStore> | ((state: GameStore) => void)) => void;
 }
 
+const userInterfaceDefaults = {
+    isDisabled: false,
+    showTipLog: false,
+    isShowingLongRangeScanner: false,
+    isShowingSystemStatus: false,
+    isShowingLogs: false,
+    isShowingMenu: false,
+    gameObjectRotations: {},
+}
+
+const playerTurnDefaults = {
+
+}
+
+const enemyTurnDefaults = {
+    aiActorSequence: [],
+    currentActorAction: null,
+}
+
 export const useGameStore = create<GameStore>()(
     devtools(
         persist(
@@ -138,32 +154,29 @@ export const useGameStore = create<GameStore>()(
             startGame: () => {
                 set((state) => {
                     state.gameData = createNewGame();
+                    state.userInterface = { ...state.userInterface, ...userInterfaceDefaults };
+                    state.playerTurn = { ...state.playerTurn, ...playerTurnDefaults };
+                    state.enemyTurn = { ...state.enemyTurn, ...enemyTurnDefaults };
                     get().requestNav('/game');
                 })
             },
 
             userInterface: {
-                isDisabled: false,
-                showTipLog: false,
+                ...userInterfaceDefaults,
                 hideTipLog: () => { set((state) => { state.userInterface.showTipLog = false; }); },
                 selectGameObject: (go:GameObject|null) => {
                     set((state) => {
                         state.gameData.selectedGameObject = go;
                     });
                 },
-                isShowingLongRangeScanner: false,
                 showLongRangeScanner: () => { set((state) => { state.userInterface.isShowingLongRangeScanner = true; }); },
                 hideLongRangeScanner: () => { set((state) => { state.userInterface.isShowingLongRangeScanner = false; }); },
-                isShowingSystemStatus: false,
                 showSystemStatus: () => { set((state) => { state.userInterface.isShowingSystemStatus = true; }); },
                 hideSystemStatus: () => { set((state) => { state.userInterface.isShowingSystemStatus = false; }); },
-                isShowingLogs: false,
                 showLogs: () => { set((state) => { state.userInterface.isShowingLogs = true; }); },
                 hideLogs: () => { set((state) => { state.userInterface.isShowingLogs = false; }); },
-                isShowingMenu: false,
                 showMenu: () => { set((state) => { state.userInterface.isShowingMenu = true; }); },
                 hideMenu: () => { set((state) => { state.userInterface.isShowingMenu = false; }); },
-                gameObjectRotations: {},
                 setGameObjectRotation: (go:GameObject, rotation:number) => { set((state) => { state.userInterface.gameObjectRotations[go.id] = rotation; });},
                 clearGameObjectRotations: () => { set((state) => { state.userInterface.gameObjectRotations = {}; }); },
             },
@@ -195,19 +208,15 @@ export const useGameStore = create<GameStore>()(
                 toggleRepairPriority: (systemName: string) => togglePrioritisedSystem({get,set}, systemName),
                 prioritisedRepairCosts: () => calculatePrioritisedRepairCosts({get}),
                 nonPrioritisedRepairCosts: () => calculateNonPrioritisedRepairCosts({get}),
-                repair: (time) => repair({get, set}, time),
-                canRepair: false,
-                canFirePhasers: false,
-                canFireTorpedoes: false
+                repair: (time) => repair({get, set}, time)
             },
 
             enemyTurn: {
-                aiActorSequence: [],
-                currentActorAction: null,
                 setActorAction: (action) => set(state => { state.enemyTurn.currentActorAction = action; }),
                 endTurn: () => endTurn({get, set}),
                 endActorTurn: () => endActorTurn({get, set}),
-                applyPhasersToPlayer: () => applyPhasersToPlayer({get,set})
+                applyPhasersToPlayer: () => applyPhasersToPlayer({get,set}),
+                ...enemyTurnDefaults
             }
         })),
         {
@@ -215,15 +224,6 @@ export const useGameStore = create<GameStore>()(
             partialize: (state) => ({
                 gameData: state.gameData,
                 version: 1,
-                userInterface: {
-                    isDisabled: state.userInterface.isDisabled,
-                    showTipLog: state.userInterface.showTipLog,
-                    isShowingLongRangeScanner: state.userInterface.isShowingLongRangeScanner,
-                    isShowingSystemStatus: state.userInterface.isShowingSystemStatus,
-                    isShowingLogs: state.userInterface.isShowingLogs,
-                    isShowingMenu: state.userInterface.isShowingMenu,
-                    gameObjectRotations: state.userInterface.gameObjectRotations,
-                }
             }),
             onRehydrateStorage: () => {
                 return (state:any) => {
@@ -240,8 +240,7 @@ export const useGameStore = create<GameStore>()(
                     ...currentState,
                     ...persistedState,
                     userInterface: {
-                        ...currentState.userInterface,
-                        ...persistedState.userInterface,
+                        ...currentState.userInterface
                     }
                 };
             }

@@ -120,14 +120,14 @@ export function beginFiringSequence({get,set} : ContextAccessor, weapon: FiringS
 
 export function updateWeaponState(state:GameStore) {
     const player = state.gameData.player;
-    state.playerTurn.canFirePhasers =
+    state.gameData.canFirePhasers =
         player.attributes.weapons.targetGameObjectIds.length > 0 &&
         player.attributes.weapons.laserPower.currentValue > 0 &&
         player.attributes.systems.lasers.status.fraction() >= GameConstants.Rules.criticalDamageThreshold &&
         player.attributes.systems.sensors.status.fraction() >= GameConstants.Rules.criticalDamageThreshold &&
         player.attributes.energy.currentValue > 0;
 
-    state.playerTurn.canFireTorpedoes =
+    state.gameData.canFireTorpedoes =
         player.attributes.weapons.targetGameObjectIds.length > 0 &&
         player.attributes.weapons.torpedoes.currentValue > 0 &&
         player.attributes.systems.torpedoTubes.status.fraction() >= GameConstants.Rules.criticalDamageThreshold &&

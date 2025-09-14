@@ -125,5 +125,5 @@ export function repair(stateAccess: ContextAccessor | GameStore, time: number) {
 
 export function updateCanRepair(state:GameStore) {
     const enemiesInQuadrant = objectsInQuadrant(state.gameData).filter(go => go.type === GameObjectType.Enemy);
-    state.playerTurn.canRepair = enemiesInQuadrant.length === 0;
+    state.gameData.canRepair = enemiesInQuadrant.length === 0;
 }

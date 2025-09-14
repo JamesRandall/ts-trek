@@ -46,6 +46,10 @@ export function createNewGame() : GameData {
         isWarping: false,
         logs: [],
         sensorImpactedGameObjectIds: [],
-        gameOver: GameOverState.No
+        gameOver: GameOverState.No,
+        // player status for buttons
+        canRepair: false,
+        canFirePhasers: false,
+        canFireTorpedoes: false
     };
 }

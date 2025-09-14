@@ -11,7 +11,7 @@ export function SystemStatus() {
     const toggleRepairPriority = useGameStore(s => s.playerTurn.toggleRepairPriority);
     const prioritisedRepairCosts = useGameStore(s => s.playerTurn.prioritisedRepairCosts);
     const nonPrioritisedRepairCosts = useGameStore(s => s.playerTurn.nonPrioritisedRepairCosts);
-    const canRepair = useGameStore(s => s.playerTurn.canRepair);
+    const canRepair = useGameStore(s => s.gameData.canRepair);
 
     const renderProps = useMemo(() => {
         const timeToRepairPrioritisedSystems = prioritisedRepairCosts();

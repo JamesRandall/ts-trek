@@ -5,8 +5,8 @@ export default function WeaponButtons() {
     const firePhasers = useGameStore(s => s.playerTurn.firePhasers);
     const fireTorpedoes = useGameStore(s => s.playerTurn.fireTorpedoes);
     const isDisabled = useGameStore(s => s.userInterface.isDisabled);
-    const canFirePhasers = useGameStore(s => s.playerTurn.canFirePhasers);
-    const canFireTorpedoes = useGameStore(s => s.playerTurn.canFireTorpedoes);
+    const canFirePhasers = useGameStore(s => s.gameData.canFirePhasers);
+    const canFireTorpedoes = useGameStore(s => s.gameData.canFireTorpedoes);
 
     // tailwind-keep: text-red-500 border-red-500
     // tailwind-keep: disabled:text-red-900 disabled:border-red-900
