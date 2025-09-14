@@ -4,6 +4,7 @@ import {FiringSequenceActionType} from "../../models/gameData.ts";
 import {ExplosionAnimation} from "./ExplosionAnimation.tsx";
 import {useAssets} from "../../AssetManager.tsx";
 import {useCallback, useRef, useEffect} from "react";
+import {getGameObjectAsset} from "../../models/gameObject.ts";
 
 export function ExplosionOverlay({cellSize} : { cellSize: { width: number, height: number} }) {
     const assetManager = useAssets();
@@ -38,7 +39,7 @@ export function ExplosionOverlay({cellSize} : { cellSize: { width: number, heigh
         <div className="absolute inset-0 z-30">
             <ExplosionAnimation
                 key={`explosion-${targetObject.id}-${firingItem.targetId}`}
-                image={targetObject.asset(assetManager.assets)!}
+                image={getGameObjectAsset(targetObject, assetManager.assets)!}
                 sector={targetObject.position.sector}
                 cellSize={cellSize}
                 rotation={rotation}
