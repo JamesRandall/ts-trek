@@ -40,7 +40,47 @@ export type GameLog = {
     level: GameLogLevel
 };
 
+
+export type WarpConstants = {
+    warpMovementCostPerQuadrantAtWarp10: number;
+    warpMovementCostPerQuadrantAtWarp1: number;
+    energyGenerationPerQuadrant: number;
+    chanceOfEnemyGettingFirstTurnInNewQuadrant: number;
+    shieldsLoweredGenerationMultiplier: number;
+}
+
+export type ImpulseConstants = {
+    impulseMovementCostPerQuadrant: number;
+}
+
+export type PlayerWeaponConstants = {
+    phaserOnShieldsMultiplier: number;
+    phaserOnHullMultiplier: number;
+    torpedoOnShieldsMultiplier: number;
+    torpedoOnHullMultiplier: number;
+    torpedoDamage: number;
+}
+
+export type RepairConstants = {
+    percentageOfMaxCrewCanUndertakeRepairs: number;
+    repairRatePerCrewMemberPerDay: number;
+}
+
+export type EnemyWeaponConstants = {
+    phaserOnShieldsMultiplier: number;
+    phaserOnHullMultiplier: number;
+}
+
+export type DifficultyConstants = {
+    warp: WarpConstants;
+    impulse: ImpulseConstants;
+    playerWeapons: PlayerWeaponConstants;
+    repair: RepairConstants;
+    enemyWeaponConstants: EnemyWeaponConstants;
+}
+
 export type GameData = {
+    difficultyConstants: DifficultyConstants;
     stardate: number;
     state: GameState;
     player: Player;

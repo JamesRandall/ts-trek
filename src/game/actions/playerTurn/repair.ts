@@ -4,18 +4,16 @@ import type {RangedValue} from "../../models/RangedValue.ts";
 import {endTurn} from "./endTurn.ts";
 import {objectsInQuadrant} from "../map.ts";
 import {GameObjectType} from "../../models/gameObject.ts";
+import type {RepairConstants} from "../../models/gameData.ts";
 
-const percentageOfMaxCrewCanUndertakeRepairs = 0.25;
-const repairRatePerCrewMemberPerDay = 0.5;
-
-function calculateDailyRepairPoints(crew: RangedValue) {
+function calculateDailyRepairPoints(constants: RepairConstants, crew: RangedValue) {
     const availableCrew = crew.currentValue;
-    return availableCrew * percentageOfMaxCrewCanUndertakeRepairs * repairRatePerCrewMemberPerDay;
+    return availableCrew * constants.percentageOfMaxCrewCanUndertakeRepairs * constants.repairRatePerCrewMemberPerDay;
 }
 
-function calculateRepairCosts(crew: RangedValue, systems: PlayerShipSystem[]) {
+function calculateRepairCosts(constants: RepairConstants, crew: RangedValue, systems: PlayerShipSystem[]) {
     const totalDamage = systems.reduce((acc,s) => acc + (s.status.maxValue - s.status.currentValue), 0);
-    return totalDamage / calculateDailyRepairPoints(crew);
+    return totalDamage / calculateDailyRepairPoints(constants, crew);
 }
 
 export function togglePrioritisedSystem({set}: ContextAccessor, systemKey: string) {
@@ -29,27 +27,30 @@ export function togglePrioritisedSystem({set}: ContextAccessor, systemKey: strin
 
 export function calculatePrioritisedRepairCosts({get}: ReadonlyContextAccessor) {
     const player = get().gameData.player;
+    const constants = get().gameData.difficultyConstants.repair;
     const prioritisedSystems =
         Object
             .entries(player.attributes.systems)
             .filter(([k,v]) => v.isRepairPrioritised && (k !== 'hull' || player.attributes.isDocked))
             .map(kvp => kvp[1]);
-    return calculateRepairCosts(player.attributes.crew, prioritisedSystems);
+    return calculateRepairCosts(constants, player.attributes.crew, prioritisedSystems);
 }
 
 export function calculateNonPrioritisedRepairCosts({get}: ReadonlyContextAccessor) {
     const player = get().gameData.player;
+    const constants = get().gameData.difficultyConstants.repair;
     const prioritisedSystems =
         Object
             .entries(player.attributes.systems)
             .filter(([k,v]) => !v.isRepairPrioritised && (k !== 'hull' || player.attributes.isDocked))
             .map(kvp => kvp[1]);
-    return calculateRepairCosts(player.attributes.crew, prioritisedSystems);
+    return calculateRepairCosts(constants, player.attributes.crew, prioritisedSystems);
 }
 
 export function applyRepairForTime(state:GameStore, time: number) {
     const player = state.gameData.player;
-    const dailyRepairPoints = calculateDailyRepairPoints(player.attributes.crew);
+    const constants = state.gameData.difficultyConstants.repair;
+    const dailyRepairPoints = calculateDailyRepairPoints(constants, player.attributes.crew);
     let remainingRepairPoints = dailyRepairPoints * time;
 
     // Helper function to apply repair points to a list of systems

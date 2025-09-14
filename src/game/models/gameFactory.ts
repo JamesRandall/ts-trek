@@ -3,10 +3,38 @@ import {createPlayer, playerAttributes} from "./Player.ts";
 import {uniqueRandomPositionFactory} from "./universePosition.ts";
 import {range} from "../utilities.ts";
 import {createStarbase} from "./Starbase.ts";
-import {type GameData, GameOverState, GameState} from "./gameData.ts";
+import {type DifficultyConstants, type GameData, GameOverState, GameState} from "./gameData.ts";
 import {createStar} from "./Star.ts";
 import * as GameConstants from '../gameConstants.ts';
 import {GameObjectType} from "./gameObject.ts";
+
+const normalDifficultyConstants : DifficultyConstants = {
+    warp: {
+        warpMovementCostPerQuadrantAtWarp10: 500.0,
+        warpMovementCostPerQuadrantAtWarp1: 10.0,
+        energyGenerationPerQuadrant: 150.0,
+        chanceOfEnemyGettingFirstTurnInNewQuadrant: 0.25,
+        shieldsLoweredGenerationMultiplier: 1.2
+    },
+    impulse: {
+        impulseMovementCostPerQuadrant: 75
+    },
+    playerWeapons: {
+        phaserOnShieldsMultiplier: 1,
+        phaserOnHullMultiplier: 0.4,
+        torpedoOnShieldsMultiplier: 0.2,
+        torpedoOnHullMultiplier: 1,
+        torpedoDamage: 800
+    },
+    repair: {
+        percentageOfMaxCrewCanUndertakeRepairs: 0.25,
+        repairRatePerCrewMemberPerDay: 0.5
+    },
+    enemyWeaponConstants: {
+        phaserOnShieldsMultiplier: 1.2,
+        phaserOnHullMultiplier: 0.7
+    }
+};
 
 export function createNewGame() : GameData {
     const numberOfQuadrants = 8 * 8;
@@ -23,6 +51,7 @@ export function createNewGame() : GameData {
     const playerPosition = getUniqueRandomPosition(GameObjectType.Player);
 
     return {
+        difficultyConstants: normalDifficultyConstants,
         stardate: 2509.1,
         state: GameState.PlayerTurn,
         player: createPlayer(

@@ -1,6 +1,6 @@
 import type {ContextAccessor, GameStore, ReadonlyContextAccessor} from "../../state/store.ts";
 import {verifyState} from "../verifyState.ts";
-import {type GameData, GameState} from "../../models/gameData.ts";
+import {type GameData, GameState, type WarpConstants} from "../../models/gameData.ts";
 import {objectsInQuadrant, quadrantDistance} from "../map.ts";
 import {endTurn} from "./endTurn.ts";
 import {passTime} from "./time.ts";
@@ -8,11 +8,7 @@ import {applySensorDamage, longRangeSensorScan} from "./sensors.ts";
 import {GameObjectType} from "../../models/gameObject.ts";
 import {getRandomSectorPosition} from "../../models/universePosition.ts";
 
-const warpMovementCostPerQuadrantAtWarp10 = 600.0;
-const warpMovementCostPerQuadrantAtWarp1 = 10.0;
-const energyGenerationPerQuadrant = 100.0;
-const chanceOfEnemyGettingFirstTurnInNewQuadrant = 0.25;
-const shieldsLoweredGenerationMultiplier = 1.2;
+
 
 function clamp(value: number, min: number, max: number): number {
     return Math.max(min, Math.min(max, value));
@@ -25,9 +21,9 @@ function clamp(value: number, min: number, max: number): number {
  * - steep near 1 and 10, flatter in the middle
  * a controls steepness near the ends: 0 < a < 1 (e.g., 0.5 for "square root")
  */
-function baseEnergyAtWarp(warp: number, a: number) : number {
-    const minCost = warpMovementCostPerQuadrantAtWarp1;   // e.g., 10
-    const maxCost = warpMovementCostPerQuadrantAtWarp10;  // e.g., 700
+function baseEnergyAtWarp(constants: WarpConstants, warp: number, a: number) : number {
+    const minCost = constants.warpMovementCostPerQuadrantAtWarp1;   // e.g., 10
+    const maxCost = constants.warpMovementCostPerQuadrantAtWarp10;  // e.g., 700
 
     const w = clamp(warp, 1, 10);
     const s = (w - 1) / 9; // normalize to [0,1]
@@ -37,7 +33,7 @@ function baseEnergyAtWarp(warp: number, a: number) : number {
     const s4 = (4 - 1) / 9;
     const t4 = 0.5 * (Math.pow(s4, a) + 1 - Math.pow(1 - s4, a));
 
-    const targetAt4 = energyGenerationPerQuadrant; // e.g., 100
+    const targetAt4 = constants.energyGenerationPerQuadrant; // e.g., 100
     const normTarget = (targetAt4 - minCost) / (maxCost - minCost);
 
     // Compute exponent k so that (t4^k) == normTarget, with guards
@@ -60,8 +56,8 @@ function engineHealthMultiplier(engineHealth: number, exponent = 2): number {
     return minMult + (maxMult - minMult) * Math.pow(s, exponent);
 }
 
-function energyConsumptionAtWarp(warp: number, engineHealth: number, a = 0.98): number {
-    const base = baseEnergyAtWarp(warp, a);
+function energyConsumptionAtWarp(constants: WarpConstants, warp: number, engineHealth: number, a = 0.98): number {
+    const base = baseEnergyAtWarp(constants, warp, a);
     const healthMult = engineHealthMultiplier(engineHealth);
     if (!Number.isFinite(healthMult)) return Number.POSITIVE_INFINITY;
     return base * healthMult;
@@ -71,9 +67,10 @@ function calculateEnergyDelta(gameData: GameData, specifiedDistance?: number) {
     const distance = specifiedDistance ?? quadrantDistance(gameData.player.position, {...gameData.player.position, quadrant: gameData.player.attributes.targetQuadrant});
     const warp = gameData.player.attributes.warpSpeed.currentValue;
     const engineHealth = gameData.player.attributes.systems.warpEngines.status.fraction();
+    const constants = gameData.difficultyConstants.warp;
 
-    const consumption = energyConsumptionAtWarp(warp, engineHealth) * distance;
-    const generated = energyGenerationPerQuadrant * distance * (gameData.player.attributes.shields.raised ? 1.0 : shieldsLoweredGenerationMultiplier);
+    const consumption = energyConsumptionAtWarp(constants, warp, engineHealth) * distance;
+    const generated = constants.energyGenerationPerQuadrant * distance * (gameData.player.attributes.shields.raised ? 1.0 : constants.shieldsLoweredGenerationMultiplier);
 
     return generated - consumption;
 }
@@ -153,7 +150,7 @@ export function endWarpTo({ get, set}: ContextAccessor) {
         applySensorDamage(state);
         longRangeSensorScan(state);
 
-        if (Math.random() < chanceOfEnemyGettingFirstTurnInNewQuadrant) {
+        if (Math.random() < state.gameData.difficultyConstants.warp.chanceOfEnemyGettingFirstTurnInNewQuadrant) {
             endTurn(state);
         }
     });

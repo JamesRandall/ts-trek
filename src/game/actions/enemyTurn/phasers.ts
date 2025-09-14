@@ -7,9 +7,6 @@ import {GameLogLevel} from "../../models/gameData.ts";
 import * as GameConstants from "../../gameConstants.ts";
 import {range} from "../../utilities.ts";
 
-const phaserOnShieldsMultiplier = 1.2;
-const phaserOnHullMultiplier = 0.7;
-
 function getImpactedShield(state:GameStore, enemy: Enemy) : { label: string, shield: RangedValue } | null {
     const player = state.gameData.player;
     if (!player.attributes.shields.raised) { return null;}
@@ -45,6 +42,7 @@ export function applyPhasersToPlayer({set}: ContextAccessor) {
 
         if (state.enemyTurn.aiActorSequence.length === 0) { return; }
         if (state.enemyTurn.currentActorAction !== AiActorAction.FirePhasers) { return; }
+        const constants = state.gameData.difficultyConstants.enemyWeaponConstants;
 
         const player = state.gameData.player;
         const enemy = state.gameData.enemies.find(go => go.id === state.enemyTurn.aiActorSequence[0]);
@@ -54,10 +52,10 @@ export function applyPhasersToPlayer({set}: ContextAccessor) {
         let remainingEnergy = phaserPower;
         const impactedShield = getImpactedShield(state, enemy);
         if (impactedShield !== null) {
-            const shieldDamage = phaserPower * phaserOnShieldsMultiplier;
+            const shieldDamage = phaserPower * constants.phaserOnShieldsMultiplier;
             const newEnemyShields = Math.max(0, impactedShield.shield.currentValue - shieldDamage);
             const shieldDamageDealt = impactedShield.shield.currentValue - newEnemyShields;
-            remainingEnergy = phaserPower - (shieldDamageDealt / phaserOnShieldsMultiplier)
+            remainingEnergy = phaserPower - (shieldDamageDealt / constants.phaserOnShieldsMultiplier)
             impactedShield.shield.currentValue = newEnemyShields;
             if (impactedShield.shield.currentValue <= 0) {
                 gameLog(state, GameLogLevel.Red, `${impactedShield.label} shields down` );
@@ -71,10 +69,10 @@ export function applyPhasersToPlayer({set}: ContextAccessor) {
         let damageableSystems = getDamageableSystemsAsArray(player).filter(s => s.status.currentValue > 0);
         while(remainingEnergy > 0 && damageableSystems.length > 0 && !isPlayerDestroyed(player)) {
             const randomSystem = damageableSystems[Math.floor(Math.random() * damageableSystems.length)];
-            const directDamage = remainingEnergy * phaserOnHullMultiplier;
+            const directDamage = remainingEnergy * constants.phaserOnHullMultiplier;
             const appliedDamage = Math.min(randomSystem.status.currentValue, directDamage);
             applyDeltaToRangedValue(randomSystem.status, -appliedDamage);
-            remainingEnergy -= appliedDamage / phaserOnHullMultiplier;
+            remainingEnergy -= appliedDamage / constants.phaserOnHullMultiplier;
             damageableSystems = getDamageableSystemsAsArray(player).filter(s => s.status.currentValue > 0);
 
             const damageLogged = applyDamageEffect(state, randomSystem);

@@ -6,8 +6,6 @@ import {distanceBetween, objectAtPosition} from "../map.ts";
 import {endTurn} from "./endTurn.ts";
 import {passTime} from "./time.ts";
 
-const impulseMovementCostPerQuadrant = 75.0;
-
 const isBlocked = (ctx: ReadonlyContextAccessor, universePosition: UniversePosition) =>
     objectAtPosition(ctx, universePosition) !== undefined;
 
@@ -17,7 +15,7 @@ export function impulseTo({ get, set}: ContextAccessor, sector:{x:number,y:numbe
     if (isBlocked({get}, { ...player.position, sector })) { return; }
 
     const distance = distanceBetween(player.position, { ...player.position, sector });
-    const energyCost = distance * impulseMovementCostPerQuadrant / player.attributes.systems.impulseDrives.status.fraction();
+    const energyCost = distance * get().gameData.difficultyConstants.impulse.impulseMovementCostPerQuadrant / player.attributes.systems.impulseDrives.status.fraction();
     if (energyCost > player.attributes.energy.currentValue) {
         return;
     }

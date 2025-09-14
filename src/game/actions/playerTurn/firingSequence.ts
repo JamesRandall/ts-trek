@@ -1,34 +1,28 @@
 import type {ContextAccessor, GameStore} from "../../state/store.ts";
 import type {Enemy} from "../../models/Enemy.ts";
 import type {Player} from "../../models/Player.ts";
-import {FiringSequenceActionType, GameState} from "../../models/gameData.ts";
+import {FiringSequenceActionType, GameState, type PlayerWeaponConstants} from "../../models/gameData.ts";
 import {endTurn} from "./endTurn.ts";
 import {verifyState} from "../verifyState.ts";
 import {passTime} from "./time.ts";
 import * as GameConstants from "../../gameConstants.ts";
 import {applyDeltaToRangedValue} from "../../models/RangedValue.ts";
 
-const phaserOnShieldsMultiplier = 1;
-const phaserOnHullMultiplier = 0.4;
-const torpedoOnShieldsMultiplier = 0.2;
-const torpedoOnHullMultiplier = 1;
-const torpedoDamage = 800;
-
-function applyPhaserHitToEnemy(player: Player, target: Enemy) {
+function applyPhaserHitToEnemy(constants: PlayerWeaponConstants, player: Player, target: Enemy) {
     const phaserPower = Math.min(player.attributes.weapons.laserPower.currentValue, player.attributes.energy.currentValue);
 
     // Apply damage to shields first
-    const shieldDamage = phaserPower * phaserOnShieldsMultiplier;
+    const shieldDamage = phaserPower * constants.phaserOnShieldsMultiplier;
     const newEnemyShields = Math.max(0, target.attributes.shields.currentValue - shieldDamage);
 
     // Calculate remaining energy after shield damage
     const shieldDamageDealt = target.attributes.shields.currentValue - newEnemyShields;
-    const remainingEnergy = phaserPower - (shieldDamageDealt / phaserOnShieldsMultiplier);
+    const remainingEnergy = phaserPower - (shieldDamageDealt / constants.phaserOnShieldsMultiplier);
 
     // Apply remaining energy to hull if any
     let newEnemyHull = target.attributes.hull.currentValue;
     if (remainingEnergy > 0) {
-        const hullDamage = remainingEnergy * phaserOnHullMultiplier;
+        const hullDamage = remainingEnergy * constants.phaserOnHullMultiplier;
         newEnemyHull = Math.max(0, target.attributes.hull.currentValue - hullDamage);
     }
 
@@ -49,14 +43,14 @@ function applyPhaserHitToEnemy(player: Player, target: Enemy) {
     return target.attributes.hull.currentValue <= 0;
 }
 
-function applyTorpedoHitToEnemy(player: Player, target: Enemy) {
-    const shieldDamage = torpedoDamage * torpedoOnShieldsMultiplier;
+function applyTorpedoHitToEnemy(constants: PlayerWeaponConstants, player: Player, target: Enemy) {
+    const shieldDamage = constants.torpedoDamage * constants.torpedoOnShieldsMultiplier;
     const newEnemyShields = Math.max(0, target.attributes.shields.currentValue - shieldDamage);
     const shieldDamageDealt = target.attributes.shields.currentValue - newEnemyShields;
-    const remainingDamage = torpedoDamage - (shieldDamageDealt / torpedoOnShieldsMultiplier);
+    const remainingDamage = constants.torpedoDamage - (shieldDamageDealt / constants.torpedoOnShieldsMultiplier);
     let newEnemyHull = target.attributes.hull.currentValue;
     if (remainingDamage > 0) {
-        const hullDamage = remainingDamage * torpedoOnHullMultiplier;
+        const hullDamage = remainingDamage * constants.torpedoOnHullMultiplier;
         newEnemyHull = Math.max(0, target.attributes.hull.currentValue - hullDamage);
     }
     target.attributes.shields.currentValue = newEnemyShields;
@@ -75,6 +69,7 @@ export function nextFiringSequenceItem({get,set} : ContextAccessor) {
         if (!head) {
             return;
         }
+        const constants = state.gameData.difficultyConstants.playerWeapons;
 
         if (head.type === FiringSequenceActionType.Destroyed) {
             state.gameData.enemies = state.gameData.enemies.filter(e => e.id !== head.targetId);
@@ -83,7 +78,7 @@ export function nextFiringSequenceItem({get,set} : ContextAccessor) {
         else if (head.type === FiringSequenceActionType.Phasers) {
             const enemy = state.gameData.enemies.find(e => e.id === head.targetId);
             if (enemy) {
-                const isEnemyDestroyed = applyPhaserHitToEnemy(state.gameData.player, enemy);
+                const isEnemyDestroyed = applyPhaserHitToEnemy(constants, state.gameData.player, enemy);
                 if (isEnemyDestroyed) {
                     state.gameData.firingSequence[0].type = FiringSequenceActionType.Destroyed;
                     return;
@@ -93,7 +88,7 @@ export function nextFiringSequenceItem({get,set} : ContextAccessor) {
         else if (head.type === FiringSequenceActionType.Torpedoes) {
             const enemy = state.gameData.enemies.find(e => e.id === head.targetId);
             if (enemy) {
-                const isEnemyDestroyed = applyTorpedoHitToEnemy(state.gameData.player, enemy);
+                const isEnemyDestroyed = applyTorpedoHitToEnemy(constants, state.gameData.player, enemy);
                 if (isEnemyDestroyed) {
                     state.gameData.firingSequence[0].type = FiringSequenceActionType.Destroyed;
                     return;
