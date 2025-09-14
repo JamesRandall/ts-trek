@@ -3,6 +3,7 @@ import { CanvasSurface } from "../../../components/CanvasSurface.tsx";
 import Starfield from './Starfield.tsx';
 import * as htmlToImage from 'html-to-image';
 import {useNavigate} from "react-router-dom";
+import {useGameStore} from "../../state/store.ts";
 
 
 type Fragment = {
@@ -26,12 +27,14 @@ export function GameOverAnimation() {
     const [showStarfield, setShowStarfield] = useState(false);
     const closeTimerHandle = useRef<number|null>(null);
     const animationStartTimeRef = useRef<number | null>(null); // Track when animation actually starts
+    const resetGame = useGameStore(s => s.resetGame);
 
     const close = () => {
         if (closeTimerHandle.current !== null) {
             clearTimeout(closeTimerHandle.current);
             closeTimerHandle.current = null;
         }
+        resetGame();
         navigate("/");
     }
 

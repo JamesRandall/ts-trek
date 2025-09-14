@@ -89,7 +89,7 @@ export function applyPhasersToPlayer({set}: ContextAccessor) {
         }
 
         // Handy if you want to test game over flows
-        //state.gameData.player.attributes.systems.hull.status.currentValue = 0.0;
+        // state.gameData.player.attributes.systems.hull.status.currentValue = 0.0;
     });
 }
 

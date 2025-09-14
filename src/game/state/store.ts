@@ -50,6 +50,7 @@ export type GameStore = {
 
     // Game
     startGame: () => void;
+    resetGame: () => void;
     userInterface: {
         isDisabled : boolean;
         showTipLog: boolean;
@@ -158,6 +159,15 @@ export const useGameStore = create<GameStore>()(
                     state.playerTurn = { ...state.playerTurn, ...playerTurnDefaults };
                     state.enemyTurn = { ...state.enemyTurn, ...enemyTurnDefaults };
                     get().requestNav('/game');
+                })
+            },
+            resetGame: () => {
+                set((state) => {
+                    state.gameData = createNewGame();
+                    state.gameData.gameState = GameState.NoGame;
+                    state.userInterface = { ...state.userInterface, ...userInterfaceDefaults };
+                    state.playerTurn = { ...state.playerTurn, ...playerTurnDefaults };
+                    state.enemyTurn = { ...state.enemyTurn, ...enemyTurnDefaults };
                 })
             },
 
