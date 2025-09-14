@@ -1,7 +1,6 @@
 import type {Enemy} from "./Enemy.ts";
 import type {Starbase} from "./Starbase.ts";
 import type {Player} from "./Player.ts";
-import type {Star} from "./Star.ts";
 import type {GameObject} from "./gameObject.ts";
 
 export const GameState = {
@@ -45,7 +44,7 @@ export type GameData = {
     stardate: number;
     state: GameState;
     player: Player;
-    stars: Star[];
+    stars: GameObject[];
     enemies: Enemy[];
     starbases: Starbase[];
     selectedGameObject: GameObject | null;

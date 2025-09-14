@@ -1,10 +1,12 @@
-import type {ContextAccessor, ReadonlyContextAccessor} from "../../state/store.ts";
+import type {ContextAccessor, GameStore, ReadonlyContextAccessor} from "../../state/store.ts";
 import {verifyState} from "../verifyState.ts";
 import {type GameData, GameState} from "../../models/gameData.ts";
-import {quadrantDistance} from "../map.ts";
+import {objectsInQuadrant, quadrantDistance} from "../map.ts";
 import {endTurn} from "./endTurn.ts";
 import {passTime} from "./time.ts";
 import {applySensorDamage, longRangeSensorScan} from "./sensors.ts";
+import {GameObjectType} from "../../models/gameObject.ts";
+import {getRandomSectorPosition} from "../../models/universePosition.ts";
 
 const warpMovementCostPerQuadrantAtWarp10 = 600.0;
 const warpMovementCostPerQuadrantAtWarp1 = 10.0;
@@ -145,7 +147,7 @@ export function endWarpTo({ get, set}: ContextAccessor) {
         state.gameData.player.attributes.energy.currentValue = newEnergy;
         state.gameData.player.attributes.weapons.targetGameObjectIds = [];
         state.gameData.isWarping = false;
-        state.gameData.player.position.quadrant = state.gameData.player.attributes.targetQuadrant;
+        safelyMovePlayer(state);
         state.gameData.sensorImpactedGameObjectIds = [];
 
         applySensorDamage(state);
@@ -155,6 +157,16 @@ export function endWarpTo({ get, set}: ContextAccessor) {
             endTurn(state);
         }
     });
+}
+
+function safelyMovePlayer(state: GameStore) {
+    state.gameData.player.position.quadrant = state.gameData.player.attributes.targetQuadrant;
+    let spos = state.gameData.player.position.sector;
+    const gameObjects = objectsInQuadrant(state.gameData).filter(go => go.type !== GameObjectType.Player);
+    while(gameObjects.filter(go => go.position.sector.x === spos.x && go.position.sector.y === spos.y).length > 0) {
+       spos = getRandomSectorPosition();
+    }
+    state.gameData.player.position.sector = spos;
 }
 
 export function setWarpSpeed({set}:ContextAccessor, warpSpeed: number) {

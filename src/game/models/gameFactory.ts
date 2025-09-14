@@ -4,20 +4,23 @@ import {uniqueRandomPositionFactory} from "./universePosition.ts";
 import {range} from "../utilities.ts";
 import {createStarbase} from "./Starbase.ts";
 import {type GameData, GameOverState, GameState} from "./gameData.ts";
-import {Star} from "./Star.ts";
+import {createStar} from "./Star.ts";
 import * as GameConstants from '../gameConstants.ts';
+import {GameObjectType} from "./gameObject.ts";
 
 export function createNewGame() : GameData {
     const numberOfQuadrants = 8 * 8;
 
-    const numberOfEnemies = Math.round(numberOfQuadrants * 1.5);
-    const numberOfEnemyScouts = Math.round(numberOfEnemies * 0.333);
-    const numberOfEnemyWarbirds = Math.round(numberOfEnemies * 0.5);
-    const numberOfEnemyCubes = numberOfEnemies - numberOfEnemyScouts - numberOfEnemyWarbirds;
+    const numberOfEnemyCubes = 8;
+    const numberOfEnemies = Math.round((numberOfQuadrants * 1.5) - numberOfEnemyCubes);
+    const numberOfEnemyScouts = Math.round(numberOfEnemies * 0.6);
+    const numberOfEnemyWarbirds = Math.round(numberOfEnemies * 0.4);
+
     const numberOfStars = numberOfQuadrants * 2;
     const numberOfStarbases = Math.round(numberOfQuadrants / 8);
-    const getUniqueRandomPosition = uniqueRandomPositionFactory();
-    const playerPosition = getUniqueRandomPosition();
+    const { getUniqueRandomPosition, placeUniquelyInSector } = uniqueRandomPositionFactory();
+
+    const playerPosition = getUniqueRandomPosition(GameObjectType.Player);
 
     return {
         stardate: 2509.1,
@@ -26,9 +29,9 @@ export function createNewGame() : GameData {
             playerPosition,
             playerAttributes()
         ),
-        stars: range(0, numberOfStars).map(() => new Star(getUniqueRandomPosition())),
-        enemies: range(0, numberOfEnemyScouts).map(() => createScout(getUniqueRandomPosition())).concat(range(0, numberOfEnemyWarbirds).map(() => createWarbird(getUniqueRandomPosition()))).concat(range(0, numberOfEnemyCubes).map(() => createCube(getUniqueRandomPosition()))),
-        starbases: range(0, numberOfStarbases).map((i) => (createStarbase(getUniqueRandomPosition(), i))),
+        stars: range(0, numberOfStars).map(() => createStar(getUniqueRandomPosition(GameObjectType.Star))),
+        enemies: range(0, numberOfEnemyScouts).map(() => createScout(getUniqueRandomPosition(GameObjectType.Enemy))).concat(range(0, numberOfEnemyWarbirds).map(() => createWarbird(getUniqueRandomPosition(GameObjectType.Enemy)))).concat(range(0, numberOfEnemyCubes).map(() => createCube(placeUniquelyInSector(GameObjectType.Enemy)))),
+        starbases: range(0, numberOfStarbases).map((i) => (createStarbase(placeUniquelyInSector(GameObjectType.Starbase), i))),
         selectedGameObject: null,
         firingSequence: [],
         quadrantMapped:
