@@ -65,6 +65,7 @@ export type PlayerWeaponConstants = {
 export type RepairConstants = {
     percentageOfMaxCrewCanUndertakeRepairs: number;
     repairRatePerCrewMemberPerDay: number;
+    dockedRepairMultiplier: number;
 }
 
 export type EnemyWeaponConstants = {
@@ -98,4 +99,5 @@ export type GameData = {
     canRepair: boolean;
     canFirePhasers: boolean;
     canFireTorpedoes: boolean;
+    canDock: boolean;
 }

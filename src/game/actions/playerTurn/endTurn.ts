@@ -6,6 +6,7 @@ import {GameObjectType} from "../../models/gameObject.ts";
 import {longRangeSensorScan} from "./sensors.ts";
 import {updateWeaponState} from "./firingSequence.ts";
 import {updateCanRepair} from "./repair.ts";
+import {updateDockingState} from "./docking.ts";
 
 const phaserCooldown = 200;
 
@@ -38,6 +39,7 @@ export function endTurn(state: GameStore) {
 
 export function beginPlayerTurn(state: GameStore) {
     state.gameData.state = GameTurn.PlayerTurn;
+    updateDockingState(state);
     updateWeaponState(state);
     updateCanRepair(state);
 }

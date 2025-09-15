@@ -6,14 +6,14 @@ import {objectsInQuadrant} from "../map.ts";
 import {GameObjectType} from "../../models/gameObject.ts";
 import type {RepairConstants} from "../../models/gameData.ts";
 
-function calculateDailyRepairPoints(constants: RepairConstants, crew: RangedValue) {
+function calculateDailyRepairPoints(constants: RepairConstants, isDocked: boolean, crew: RangedValue) {
     const availableCrew = crew.currentValue;
-    return availableCrew * constants.percentageOfMaxCrewCanUndertakeRepairs * constants.repairRatePerCrewMemberPerDay;
+    return availableCrew * constants.percentageOfMaxCrewCanUndertakeRepairs * constants.repairRatePerCrewMemberPerDay * (isDocked ? (constants.dockedRepairMultiplier ?? 1.33) : 1.0);
 }
 
-function calculateRepairCosts(constants: RepairConstants, crew: RangedValue, systems: PlayerShipSystem[]) {
+function calculateRepairCosts(constants: RepairConstants, isDocked: boolean, crew: RangedValue, systems: PlayerShipSystem[]) {
     const totalDamage = systems.reduce((acc,s) => acc + (s.status.maxValue - s.status.currentValue), 0);
-    return totalDamage / calculateDailyRepairPoints(constants, crew);
+    return totalDamage / calculateDailyRepairPoints(constants, isDocked, crew);
 }
 
 export function togglePrioritisedSystem({set}: ContextAccessor, systemKey: string) {
@@ -33,7 +33,7 @@ export function calculatePrioritisedRepairCosts({get}: ReadonlyContextAccessor) 
             .entries(player.attributes.systems)
             .filter(([k,v]) => v.isRepairPrioritised && (k !== 'hull' || player.attributes.isDocked))
             .map(kvp => kvp[1]);
-    return calculateRepairCosts(constants, player.attributes.crew, prioritisedSystems);
+    return calculateRepairCosts(constants, player.attributes.isDocked, player.attributes.crew, prioritisedSystems);
 }
 
 export function calculateNonPrioritisedRepairCosts({get}: ReadonlyContextAccessor) {
@@ -44,13 +44,13 @@ export function calculateNonPrioritisedRepairCosts({get}: ReadonlyContextAccesso
             .entries(player.attributes.systems)
             .filter(([k,v]) => !v.isRepairPrioritised && (k !== 'hull' || player.attributes.isDocked))
             .map(kvp => kvp[1]);
-    return calculateRepairCosts(constants, player.attributes.crew, prioritisedSystems);
+    return calculateRepairCosts(constants, player.attributes.isDocked, player.attributes.crew, prioritisedSystems);
 }
 
 export function applyRepairForTime(state:GameStore, time: number) {
     const player = state.gameData.player;
     const constants = state.gameData.difficultyConstants.repair;
-    const dailyRepairPoints = calculateDailyRepairPoints(constants, player.attributes.crew);
+    const dailyRepairPoints = calculateDailyRepairPoints(constants, player.attributes.isDocked, player.attributes.crew);
     let remainingRepairPoints = dailyRepairPoints * time;
 
     // Helper function to apply repair points to a list of systems

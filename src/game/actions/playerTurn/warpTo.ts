@@ -143,6 +143,7 @@ export function endWarpTo({ get, set}: ContextAccessor) {
         state.userInterface.gameObjectRotations = {};
         state.gameData.player.attributes.energy.currentValue = newEnergy;
         state.gameData.player.attributes.weapons.targetGameObjectIds = [];
+        state.gameData.player.attributes.isDocked = false;
         state.gameData.isWarping = false;
         safelyMovePlayer(state);
         state.gameData.sensorImpactedGameObjectIds = [];

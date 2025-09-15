@@ -29,6 +29,7 @@ import {
     togglePrioritisedSystem
 } from "../actions/playerTurn/repair.ts";
 import {patchRangedValues} from "../models/RangedValue.ts";
+import {dock, undock} from "../actions/playerTurn/docking.ts";
 
 export const AiActorAction = {
     FirePhasers: 'FirePhasers',
@@ -96,6 +97,8 @@ export type GameStore = {
         prioritisedRepairCosts: () => number;
         nonPrioritisedRepairCosts: () => number;
         repair: (time: number) => void;
+        dock: () => void;
+        undock: () => void;
     },
     enemyTurn: {
         aiActorSequence: string[];
@@ -218,7 +221,9 @@ export const useGameStore = create<GameStore>()(
                 toggleRepairPriority: (systemName: string) => togglePrioritisedSystem({get,set}, systemName),
                 prioritisedRepairCosts: () => calculatePrioritisedRepairCosts({get}),
                 nonPrioritisedRepairCosts: () => calculateNonPrioritisedRepairCosts({get}),
-                repair: (time) => repair({get, set}, time)
+                repair: (time) => repair({get, set}, time),
+                dock: () => dock({get, set}),
+                undock: () => undock({get, set})
             },
 
             enemyTurn: {

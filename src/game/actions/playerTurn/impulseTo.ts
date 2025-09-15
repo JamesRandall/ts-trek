@@ -24,6 +24,7 @@ export function impulseTo({ get, set}: ContextAccessor, sector:{x:number,y:numbe
         passTime(state, 0.1);
         state.gameData.player.position = { ...player.position, sector };
         state.gameData.player.attributes.energy.currentValue -= energyCost;
+        state.gameData.player.attributes.isDocked = false;
         endTurn(state);
     });
 }

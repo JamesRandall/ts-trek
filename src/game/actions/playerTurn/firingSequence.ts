@@ -115,6 +115,12 @@ export function beginFiringSequence({get,set} : ContextAccessor, weapon: FiringS
 
 export function updateWeaponState(state:GameStore) {
     const player = state.gameData.player;
+    if (player.attributes.isDocked) {
+        state.gameData.canFirePhasers = false;
+        state.gameData.canFireTorpedoes = false;
+        return;
+    }
+
     state.gameData.canFirePhasers =
         player.attributes.weapons.targetGameObjectIds.length > 0 &&
         player.attributes.weapons.laserPower.currentValue > 0 &&

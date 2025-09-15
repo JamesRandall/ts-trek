@@ -28,7 +28,8 @@ const normalDifficultyConstants : DifficultyConstants = {
     },
     repair: {
         percentageOfMaxCrewCanUndertakeRepairs: 0.25,
-        repairRatePerCrewMemberPerDay: 0.5
+        repairRatePerCrewMemberPerDay: 0.5,
+        dockedRepairMultiplier: 1.33
     },
     enemyWeaponConstants: {
         phaserOnShieldsMultiplier: 1.2,
@@ -79,6 +80,7 @@ export function createNewGame() : GameData {
         // player status for buttons
         canRepair: false,
         canFirePhasers: false,
-        canFireTorpedoes: false
+        canFireTorpedoes: false,
+        canDock: true
     };
 }
