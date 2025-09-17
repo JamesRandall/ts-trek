@@ -6,7 +6,7 @@ import {LongRangeScanner} from "./overlays/LongRangeScanner.tsx";
 import {SystemStatus} from "./overlays/SystemStatus.tsx";
 import {Logs} from "./overlays/Logs.tsx";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {GameMenu} from "./GameMenu.tsx";
+import {GameMenu} from "./overlays/GameMenu.tsx";
 import {faBars} from "@fortawesome/free-solid-svg-icons";
 
 export default function ScannerButtons() {

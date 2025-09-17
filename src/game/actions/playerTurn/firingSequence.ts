@@ -1,5 +1,5 @@
 import type {ContextAccessor, GameStore} from "../../state/store.ts";
-import type {Enemy} from "../../models/Enemy.ts";
+import {type Enemy, EnemyType} from "../../models/Enemy.ts";
 import type {Player} from "../../models/Player.ts";
 import {FiringSequenceActionType, GameTurn, type PlayerWeaponConstants} from "../../models/gameData.ts";
 import {endTurn} from "./endTurn.ts";
@@ -62,6 +62,15 @@ function applyTorpedoHitToEnemy(constants: PlayerWeaponConstants, player: Player
     return target.attributes.hull.currentValue <= 0;
 }
 
+function updateScoreBasedOnEnemyDestroyed(state: GameStore, head: Enemy) {
+    const scoreTracker = state.gameData.scoreTracker;
+    switch (head.enemyType) {
+        case EnemyType.Cube: scoreTracker.cubusDestroyed++; break;
+        case EnemyType.Warbird: scoreTracker.warbirdDestroyed++; break;
+        case EnemyType.Scout: scoreTracker.scoutDestroyed++; break;
+    }
+}
+
 export function nextFiringSequenceItem({get,set} : ContextAccessor) {
     if (!verifyState(get, GameTurn.PlayerTurn)) { return; }
     set((state) => {
@@ -72,8 +81,12 @@ export function nextFiringSequenceItem({get,set} : ContextAccessor) {
         const constants = state.gameData.difficultyConstants.playerWeapons;
 
         if (head.type === FiringSequenceActionType.Destroyed) {
+            const enemy = state.gameData.enemies.find(e => e.id === head.targetId);
             state.gameData.enemies = state.gameData.enemies.filter(e => e.id !== head.targetId);
             state.gameData.player.attributes.weapons.targetGameObjectIds = state.gameData.player.attributes.weapons.targetGameObjectIds.filter(t => t !== head.targetId);
+            if (enemy) {
+                updateScoreBasedOnEnemyDestroyed(state, enemy);
+            }
         }
         else if (head.type === FiringSequenceActionType.Phasers) {
             const enemy = state.gameData.enemies.find(e => e.id === head.targetId);

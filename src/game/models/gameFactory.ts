@@ -36,6 +36,13 @@ const normalDifficultyConstants : DifficultyConstants = {
     enemyWeaponConstants: {
         phaserOnShieldsMultiplier: 1.2,
         phaserOnHullMultiplier: 0.7
+    },
+    scoring: {
+        deductedPointsPerStardate: -1,
+        destroyedScoutPoints: 5,
+        destroyedWarbirdPoints: 10,
+        destroyedCubusPoints: 50,
+        destructionPenalty: -250
     }
 };
 
@@ -55,6 +62,7 @@ export function createNewGame() : GameData {
 
     return {
         difficultyConstants: normalDifficultyConstants,
+        startingStardate: 2509.1,
         stardate: 2509.1,
         state: GameTurn.PlayerTurn,
         player: createPlayer(
@@ -83,7 +91,13 @@ export function createNewGame() : GameData {
         canRepair: false,
         canFirePhasers: false,
         canFireTorpedoes: false,
-        canDock: true
+        canDock: true,
+        scoreTracker: {
+            cubusDestroyed: 0,
+            scoutDestroyed: 0,
+            warbirdDestroyed: 0,
+            finalGameState: null
+        }
     };
 }
 

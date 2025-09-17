@@ -74,16 +74,33 @@ export type EnemyWeaponConstants = {
     phaserOnHullMultiplier: number;
 }
 
+export type ScoringConstants = {
+    deductedPointsPerStardate: -1,
+    destroyedScoutPoints: 5,
+    destroyedWarbirdPoints: 10,
+    destroyedCubusPoints: 50,
+    destructionPenalty: -250
+}
+
 export type DifficultyConstants = {
     warp: WarpConstants;
     impulse: ImpulseConstants;
     playerWeapons: PlayerWeaponConstants;
     repair: RepairConstants;
     enemyWeaponConstants: EnemyWeaponConstants;
+    scoring: ScoringConstants;
+}
+
+export type ScoreTracker = {
+    cubusDestroyed: number;
+    scoutDestroyed: number;
+    warbirdDestroyed: number;
+    finalGameState: GameState | null;
 }
 
 export type GameData = {
     difficultyConstants: DifficultyConstants;
+    startingStardate: number;
     stardate: number;
     state: GameTurn;
     player: Player;
@@ -101,4 +118,5 @@ export type GameData = {
     canFirePhasers: boolean;
     canFireTorpedoes: boolean;
     canDock: boolean;
+    scoreTracker: ScoreTracker;
 }
