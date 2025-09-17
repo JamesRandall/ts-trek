@@ -19,6 +19,7 @@ export function cancelSelfDestruct({set} : ContextAccessor) {
 
 export function completeSelfDestruct({set} : ContextAccessor) {
     set(state => {
+        state.gameData.scoreTracker.finalGameState = GameState.Defeat;
         state.gameData.gameState = GameState.Defeat;
     });
 }

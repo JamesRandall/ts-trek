@@ -15,6 +15,7 @@ export function endTurn({set}:ContextAccessor) {
 export function endActorTurn(state : ContextAccessor | GameStore) {
     const applyChange = (gameState:GameStore) => {
         if (isPlayerDestroyed(gameState.gameData.player)) {
+            gameState.gameData.scoreTracker.finalGameState = GameState.Defeat;
             gameState.gameData.gameState = GameState.Defeat;
             return;
         }

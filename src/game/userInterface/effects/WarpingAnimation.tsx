@@ -3,6 +3,7 @@ import {useAssets} from "../../AssetManager.tsx";
 import {useMemo, useState} from "react";
 import {useGameStore} from "../../state/store.ts";
 import {useNavigate} from "react-router-dom";
+import {calculateScores} from "../../models/scores.ts";
 
 
 export function WarpingAnimation({isGameOver}: { isGameOver?: boolean }) {
@@ -11,6 +12,11 @@ export function WarpingAnimation({isGameOver}: { isGameOver?: boolean }) {
     const assets = useAssets();
     const endWarpTo = useGameStore(s => s.playerTurn.endWarpTo);
     const shipSrc = assets?.assets?.starshipPerspective?.src;
+    const constants = useGameStore(s => s.gameData.difficultyConstants.scoring);
+    const scores = useGameStore(s => s.gameData.scoreTracker);
+    const startingStardate = useGameStore(s => s.gameData.startingStardate);
+    const currentStardate = useGameStore(s => s.gameData.stardate);
+    const calculatedScores = calculateScores(scores, constants, startingStardate, currentStardate);
 
     const [hideShip, setHideShip] = useState(false);
     const [showGameOver, setShowGameOver] = useState(false);
@@ -166,8 +172,8 @@ export function WarpingAnimation({isGameOver}: { isGameOver?: boolean }) {
                         whiteSpace: 'nowrap'
                     }}
                 >
-                    <div>GAME OVER</div>
                     <div>YOU WON!!!</div>
+                    <div className="text-4xl">FINAL SCORE: {calculatedScores.totalScore}</div>
                 </div>
             )}
         </div>

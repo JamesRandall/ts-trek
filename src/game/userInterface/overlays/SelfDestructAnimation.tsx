@@ -2,8 +2,10 @@ import {OverlayPanel} from "../../../components/OverlayPanel.tsx";
 import {useEffect, useState} from "react";
 import GameButton from "../../../components/GameButton.tsx";
 import {useGameStore} from "../../state/store.ts";
+import {useAssets} from "../../AssetManager.tsx";
 
 export default function SelfDestructAnimation() {
+    const assetManager = useAssets();
     const [currentCounter, setCurrentCounter] = useState(5);
     const [flashColor, setFlashColor] = useState("text-red-600");
     const completeSelfDestruct = useGameStore(s => s.playerTurn.completeSelfDestruct);
@@ -33,6 +35,7 @@ export default function SelfDestructAnimation() {
             const flashTimeout = setTimeout(() => {
                 clearInterval(flashInterval);
                 setFlashColor("text-red-600"); // End on red
+                assetManager.assets?.sounds.bigExplosion();
                 completeSelfDestruct();
             }, 3000);
             

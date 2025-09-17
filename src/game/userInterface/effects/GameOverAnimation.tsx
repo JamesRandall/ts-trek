@@ -4,6 +4,7 @@ import Starfield from './Starfield.tsx';
 import * as htmlToImage from 'html-to-image';
 import {useNavigate} from "react-router-dom";
 import {useGameStore} from "../../state/store.ts";
+import {calculateScores} from "../../models/scores.ts";
 
 
 type Fragment = {
@@ -28,6 +29,11 @@ export function GameOverAnimation() {
     const closeTimerHandle = useRef<number|null>(null);
     const animationStartTimeRef = useRef<number | null>(null); // Track when animation actually starts
     const resetGame = useGameStore(s => s.resetGame);
+    const scores = useGameStore(s => s.gameData.scoreTracker);
+    const startingStardate = useGameStore(s => s.gameData.startingStardate);
+    const currentStardate = useGameStore(s => s.gameData.stardate);
+    const constants = useGameStore(s => s.gameData.difficultyConstants.scoring);
+    const calculatedScores = calculateScores(scores, constants, startingStardate, currentStardate);
 
     const close = () => {
         if (closeTimerHandle.current !== null) {
@@ -215,48 +221,65 @@ export function GameOverAnimation() {
             ctx.restore();
         });
 
+
         // Game Over text animation - starts at 2 seconds, zooms in over 2 seconds
         const gameOverStartTime = 2.0; // Start at 2 seconds
         const gameOverDuration = 2.0; // Zoom in over 2 seconds
-        
+
         if (timeSeconds >= gameOverStartTime) {
             const gameOverElapsed = timeSeconds - gameOverStartTime;
             const gameOverProgress = Math.min(gameOverElapsed / gameOverDuration, 1);
-            
+
             // Ease-in-out function for smooth animation
             const easeInOut = (t: number) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
             const easedProgress = easeInOut(gameOverProgress);
-            
+
             // Calculate scale - starts tiny (0.1) and grows to full size (1.0)
             const scale = 0.1 + (easedProgress * 0.9);
-            
+
             // Calculate opacity - fades in during the first half of the animation
             const opacity = Math.min(gameOverProgress * 2, 1);
-            
+
             // Center position
             const centerX = state.width / 2;
             const centerY = state.height / 2;
-            
+
             ctx.save();
             ctx.globalAlpha = opacity;
             ctx.translate(centerX, centerY);
             ctx.scale(scale, scale);
-            
-            // Configure text styling
-            const fontSize = Math.min(state.width, state.height) * 0.10; // Responsive font size
-            ctx.font = `bold ${fontSize}px orbitron`;
+
+            // Configure text styling for "GAME OVER"
+            const gameOverFontSize = Math.min(state.width, state.height) * 0.10; // Responsive font size
+            ctx.font = `bold ${gameOverFontSize}px orbitron`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            
-            // Text shadow/outline for better visibility
-            ctx.lineWidth = fontSize * 0.1;
+
+            // Calculate spacing between GAME OVER and score
+            const textSpacing = gameOverFontSize * 1.2;
+
+            // Text shadow/outline for GAME OVER for better visibility
+            ctx.lineWidth = gameOverFontSize * 0.1;
             ctx.strokeStyle = 'black';
-            ctx.strokeText('GAME OVER', 0, 0);
-            
-            // Main text
-            ctx.fillStyle = 'rgb(232 227 221)'; // Red color
-            ctx.fillText('GAME OVER', 0, 0);
-            
+            ctx.strokeText('GAME OVER', 0, -textSpacing / 2);
+
+            // Main GAME OVER text
+            ctx.fillStyle = 'rgb(232 227 221)';
+            ctx.fillText('GAME OVER', 0, -textSpacing / 2);
+
+            // Configure text styling for score (slightly smaller)
+            const scoreFontSize = gameOverFontSize * 0.7;
+            ctx.font = `bold ${scoreFontSize}px orbitron`;
+
+            // Text shadow/outline for score
+            ctx.lineWidth = scoreFontSize * 0.1;
+            ctx.strokeStyle = 'black';
+            ctx.strokeText(`FINAL SCORE: ${calculatedScores.totalScore}`, 0, textSpacing / 2);
+
+            // Main score text
+            ctx.fillStyle = 'rgb(232 227 221)';
+            ctx.fillText(`FINAL SCORE: ${calculatedScores.totalScore}`, 0, textSpacing / 2);
+
             ctx.restore();
         }
     }, [screenshot, fragments, animationStarted]);
