@@ -12,9 +12,9 @@ export default function WeaponButtons() {
     const isDisabled = useGameStore(s => s.userInterface.isDisabled);
     const canFirePhasers = useGameStore(s => s.gameData.canFirePhasers);
     const canFireTorpedoes = useGameStore(s => s.gameData.canFireTorpedoes);
-    const showSelfDestruct = useGameStore(s => s.userInterface.showSelfDestruct)
-    const hideSelfDestruct = useGameStore(s => s.userInterface.hideSelfDestruct);
-    const isShowingSelfDestruct = useGameStore(s => s.userInterface.isShowingSelfDestruct);
+    const showSelfDestruct = useGameStore(s => s.userInterface.showStartSelfDestruct)
+    const hideSelfDestruct = useGameStore(s => s.userInterface.hideStartSelfDestruct);
+    const isShowingSelfDestruct = useGameStore(s => s.userInterface.isShowingStartSelfDestruct);
     const selfDestructAnchorRef = useRef<HTMLDivElement | null>(null);
     const [overlayAnchor, setOverlayAnchor] = useState<{ right: number; top:number } | null>(null);
 

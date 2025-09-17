@@ -30,6 +30,7 @@ import {
 } from "../actions/playerTurn/repair.ts";
 import {patchRangedValues} from "../models/RangedValue.ts";
 import {dock, undock} from "../actions/playerTurn/docking.ts";
+import {startSelfDestruct, cancelSelfDestruct, completeSelfDestruct} from "../actions/playerTurn/selfDestruct.ts";
 
 export const AiActorAction = {
     FirePhasers: 'FirePhasers',
@@ -72,9 +73,9 @@ export type GameStore = {
         gameObjectRotations: { [key:string]: number };
         setGameObjectRotation: (go:GameObject, rotation:number) => void;
         clearGameObjectRotations: () => void;
-        showSelfDestruct: () => void;
-        hideSelfDestruct: () => void;
-        isShowingSelfDestruct: boolean;
+        showStartSelfDestruct: () => void;
+        hideStartSelfDestruct: () => void;
+        isShowingStartSelfDestruct: boolean;
     }
     playerTurn: {
         canAddTarget: () => boolean;
@@ -103,6 +104,8 @@ export type GameStore = {
         dock: () => void;
         undock: () => void;
         cancelSelfDestruct: () => void;
+        startSelfDestruct: () => void;
+        completeSelfDestruct: () => void;
     },
     enemyTurn: {
         aiActorSequence: string[];
@@ -197,8 +200,8 @@ export const useGameStore = create<GameStore>()(
                 hideMenu: () => { set((state) => { state.userInterface.isShowingMenu = false; }); },
                 setGameObjectRotation: (go:GameObject, rotation:number) => { set((state) => { state.userInterface.gameObjectRotations[go.id] = rotation; });},
                 clearGameObjectRotations: () => { set((state) => { state.userInterface.gameObjectRotations = {}; }); },
-                showSelfDestruct: () => { set(state => { state.userInterface.isShowingSelfDestruct = true; })},
-                hideSelfDestruct: () => { set(state => { state.userInterface.isShowingSelfDestruct = false; })},
+                showStartSelfDestruct: () => { set(state => { state.userInterface.isShowingStartSelfDestruct = true; })},
+                hideStartSelfDestruct: () => { set(state => { state.userInterface.isShowingStartSelfDestruct = false; })}
             },
 
             map: {
@@ -231,7 +234,9 @@ export const useGameStore = create<GameStore>()(
                 repair: (time) => repair({get, set}, time),
                 dock: () => dock({get, set}),
                 undock: () => undock({get, set}),
-                cancelSelfDestruct: () => cancelSelfDestruct({get, set})
+                cancelSelfDestruct: () => cancelSelfDestruct({get, set}),
+                startSelfDestruct: () => startSelfDestruct({get, set}),
+                completeSelfDestruct: () => completeSelfDestruct({get, set}),
             },
 
             enemyTurn: {

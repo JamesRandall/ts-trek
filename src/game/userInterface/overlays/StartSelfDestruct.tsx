@@ -3,7 +3,8 @@ import GameButton from "../../../components/GameButton.tsx";
 import {useGameStore} from "../../state/store.ts";
 
 export function StartSelfDestruct() {
-    const hideStartSelfDestruct = useGameStore(s => s.userInterface.hideSelfDestruct);
+    const hideStartSelfDestruct = useGameStore(s => s.userInterface.hideStartSelfDestruct);
+    const startSelfDestruct = useGameStore(s => s.playerTurn.startSelfDestruct);
 
     return (
         <OverlayPanel borderColor="red-600" onClick={e => e.stopPropagation()}>
@@ -13,7 +14,7 @@ export function StartSelfDestruct() {
                 <div className="text-orange-600">Once activated you will have 5 seconds to stop the countdown.</div>
                 <div className="grid grid-cols-2 gap-3">
                     <GameButton color="red-600" title="Activate self-destruct" onClick={() => {
-                        hideStartSelfDestruct();
+                        startSelfDestruct();
                     }} />
                     <GameButton color="green-600" title="Abort" onClick={() => {
                         hideStartSelfDestruct();

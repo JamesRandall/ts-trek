@@ -13,6 +13,7 @@ export type PlayerAttributes = {
     warpSpeed: RangedValue;
     targetQuadrant: { x: number; y: number };
     isDocked: boolean;
+    isSelfDestructActive: boolean;
     shields: {
         fore: RangedValue;
         aft: RangedValue;
@@ -48,6 +49,7 @@ export const playerAttributes = () : PlayerAttributes => ({
     warpSpeed: createRangedValue(7,10, 1),
     targetQuadrant: { x: -1, y: -1 },
     isDocked: false,
+    isSelfDestructActive: false,
     shields: {
         fore: createRangedValue(500),
         starboard: createRangedValue(500),

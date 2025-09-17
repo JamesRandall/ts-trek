@@ -11,6 +11,7 @@ import {EnemyAiControlLoop} from "./EnemyAiControlLoop.tsx";
 import {GameLogLevel, GameState} from "../models/gameData.ts";
 import {GameOverAnimation} from "./effects/GameOverAnimation.tsx";
 import {useNavigate} from "react-router-dom";
+import SelfDestructAnimation from "./overlays/SelfDestructAnimation.tsx";
 
 export function GameScreen() {
     const [scale, setScale] = useState(1);
@@ -20,6 +21,7 @@ export function GameScreen() {
     const hideTipLog = useGameStore(state => state.userInterface.hideTipLog);
     const logs = useGameStore(state => state.gameData.logs);
     const gameState = useGameStore(state => state.gameData.gameState);
+    const isSelfDestructActive = useGameStore(state => state.gameData.player.attributes.isSelfDestructActive);
     const tipLog = logs[logs.length - 1];
     const [timerHandle, setTimerHandle] = useState<number | null>(null);
     const [isVisible, setIsVisible] = useState(false);
@@ -132,6 +134,7 @@ export function GameScreen() {
 
             </div>
 
+            {isSelfDestructActive && <SelfDestructAnimation /> }
             {isWarping && <WarpingAnimation /> }
             {gameState === GameState.Victory && <WarpingAnimation isGameOver={true} /> }
             {gameState === GameState.Defeat && <GameOverAnimation /> }
