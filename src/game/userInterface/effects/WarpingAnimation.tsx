@@ -1,10 +1,10 @@
-import Starfield from "./effects/Starfield.tsx";
-import {useAssets} from "../AssetManager.tsx";
+import Starfield from "./Starfield.tsx";
+import {useAssets} from "../../AssetManager.tsx";
 import {useMemo, useState} from "react";
-import {useGameStore} from "../state/store.ts";
+import {useGameStore} from "../../state/store.ts";
 
 
-export function WarpingAnimation() {
+export function WarpingAnimation({isGameOver}: { isGameOver?: boolean }) {
 
     const assets = useAssets();
     const endWarpTo = useGameStore(s => s.playerTurn.endWarpTo);

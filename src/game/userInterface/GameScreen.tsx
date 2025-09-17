@@ -6,7 +6,7 @@ import SidePanel from "./SidePanel.tsx";
 import WeaponButtons from "./WeaponButtons.tsx";
 import { useEffect, useState } from "react";
 import {useGameStore} from "../state/store.ts";
-import {WarpingAnimation} from "./WarpingAnimation.tsx";
+import {WarpingAnimation} from "./effects/WarpingAnimation.tsx";
 import {EnemyAiControlLoop} from "./EnemyAiControlLoop.tsx";
 import {GameLogLevel, GameState} from "../models/gameData.ts";
 import {GameOverAnimation} from "./effects/GameOverAnimation.tsx";
@@ -133,6 +133,7 @@ export function GameScreen() {
             </div>
 
             {isWarping && <WarpingAnimation /> }
+            {gameState === GameState.Victory && <WarpingAnimation isGameOver={true} /> }
             {gameState === GameState.Defeat && <GameOverAnimation /> }
         </div>
     )
