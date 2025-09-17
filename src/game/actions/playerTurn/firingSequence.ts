@@ -34,7 +34,7 @@ function applyPhaserHitToEnemy(constants: PlayerWeaponConstants, player: Player,
     player.attributes.energy.currentValue -= phaserPower;
 
     // Apply temperature change to the phaser
-    const temperatureDelta = phaserPower * 0.4;
+    const temperatureDelta = phaserPower * constants.phaserPowerTemperatureMultiplier;
     player.attributes.weapons.laserTemperature.currentValue = Math.min(
         player.attributes.weapons.laserTemperature.maxValue,
         player.attributes.weapons.laserTemperature.currentValue + temperatureDelta

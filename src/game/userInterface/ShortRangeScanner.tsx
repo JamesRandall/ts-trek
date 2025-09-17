@@ -296,7 +296,7 @@ export function ShortRangeScanner() {
                 )}
             </div>
 
-            {selectedGameObject !== null && !sensorsCriticallyDamaged && (
+            {selectedGameObject !== null && selectedGameObject.type !== GameObjectType.Star && !sensorsCriticallyDamaged && (
                 <GameObjectPopover cellSize={cellSize} />
             )}
 

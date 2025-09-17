@@ -69,7 +69,7 @@ export const createCube = (position: UniversePosition) : Enemy =>
         position,
         EnemyType.Cube,
         {
-            hull: createRangedValue(800),
+            hull: createRangedValue(2000),
             shields: createRangedValue(1500),
             energy: createRangedValue(4500),
             torpedoes: createRangedValue(9),

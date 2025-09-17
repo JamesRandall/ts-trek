@@ -57,6 +57,7 @@ export type ImpulseConstants = {
 export type PlayerWeaponConstants = {
     phaserOnShieldsMultiplier: number;
     phaserOnHullMultiplier: number;
+    phaserPowerTemperatureMultiplier: number;
     torpedoOnShieldsMultiplier: number;
     torpedoOnHullMultiplier: number;
     torpedoDamage: number;

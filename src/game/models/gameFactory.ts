@@ -7,12 +7,13 @@ import {type DifficultyConstants, type GameData, GameState, GameTurn} from "./ga
 import {createStar} from "./Star.ts";
 import * as GameConstants from '../gameConstants.ts';
 import {GameObjectType} from "./gameObject.ts";
+import {objectsInQuadrant} from "../actions/map.ts";
 
 const normalDifficultyConstants : DifficultyConstants = {
     warp: {
-        warpMovementCostPerQuadrantAtWarp10: 500.0,
+        warpMovementCostPerQuadrantAtWarp10: 600.0,
         warpMovementCostPerQuadrantAtWarp1: 10.0,
-        energyGenerationPerQuadrant: 150.0,
+        energyGenerationPerQuadrant: 300.0,
         chanceOfEnemyGettingFirstTurnInNewQuadrant: 0.25,
         shieldsLoweredGenerationMultiplier: 1.2
     },
@@ -22,13 +23,14 @@ const normalDifficultyConstants : DifficultyConstants = {
     playerWeapons: {
         phaserOnShieldsMultiplier: 1,
         phaserOnHullMultiplier: 0.4,
+        phaserPowerTemperatureMultiplier: 0.7,
         torpedoOnShieldsMultiplier: 0.2,
         torpedoOnHullMultiplier: 1,
         torpedoDamage: 800
     },
     repair: {
         percentageOfMaxCrewCanUndertakeRepairs: 0.25,
-        repairRatePerCrewMemberPerDay: 0.5,
+        repairRatePerCrewMemberPerDay: 0.75,
         dockedRepairMultiplier: 1.33
     },
     enemyWeaponConstants: {
@@ -90,17 +92,20 @@ export function createNewLateGame() : GameData {
     const { getUniqueRandomPosition } = uniqueRandomPositionFactory(
         [...game.stars, ...game.enemies, ...game.starbases, game.player]
     );
-    return {
+    const updatedGame = {
         ...game,
         enemies: [
             createScout(getUniqueRandomPosition(GameObjectType.Enemy)),
             createWarbird(getUniqueRandomPosition(GameObjectType.Enemy)),
             createCube(getUniqueRandomPosition(GameObjectType.Enemy))
-        ],
+        ]
+    }
+    return {
+        ...updatedGame,
         quadrantMapped:
-            range(0, GameConstants.Map.quadrantSize.height-1).map(() =>
-                range(0, GameConstants.Map.quadrantSize.width-1).map(() =>
-                    true
+            range(0, GameConstants.Map.quadrantSize.height-1).map(qy =>
+                range(0, GameConstants.Map.quadrantSize.width-1).map(qx =>
+                    game.quadrantMapped[qy][qx] || (objectsInQuadrant(updatedGame, { x: qx, y: qy}).filter(go => go.type === GameObjectType.Enemy).length > 0)
                 )
             )
     };
