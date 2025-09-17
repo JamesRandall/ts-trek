@@ -1,4 +1,4 @@
-import {GameTurn} from "../../models/gameData.ts";
+import {GameState, GameTurn} from "../../models/gameData.ts";
 import type {GameStore} from "../../state/store.ts";
 import {applyDeltaToRangedValue} from "../../models/RangedValue.ts";
 import {objectsInQuadrant} from "../map.ts";
@@ -14,6 +14,10 @@ function isEnemyTurn(state: GameStore) {
     const gameObjects = objectsInQuadrant(state.gameData);
     const hasEnemy = gameObjects.find(go => go.type === GameObjectType.Enemy);
     return hasEnemy !== undefined;
+}
+
+function isGameOver(state: GameStore) {
+    return state.gameData.enemies.length === 0;
 }
 
 function buildEnemyAiSequence(state: GameStore) {
@@ -32,8 +36,14 @@ export function endTurn(state: GameStore) {
         state.gameData.state = GameTurn.EnemyTurn;
     }
     else {
-        state.userInterface.isDisabled = false;
-        beginPlayerTurn(state);
+        if (isGameOver(state)) {
+            state.gameData.gameState = GameState.Victory;
+        }
+        else {
+            state.userInterface.isDisabled = false;
+            beginPlayerTurn(state);
+        }
+
     }
 }
 

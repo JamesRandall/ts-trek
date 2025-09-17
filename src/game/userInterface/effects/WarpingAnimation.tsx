@@ -2,15 +2,18 @@ import Starfield from "./Starfield.tsx";
 import {useAssets} from "../../AssetManager.tsx";
 import {useMemo, useState} from "react";
 import {useGameStore} from "../../state/store.ts";
+import {useNavigate} from "react-router-dom";
 
 
 export function WarpingAnimation({isGameOver}: { isGameOver?: boolean }) {
 
+    const navigate = useNavigate();
     const assets = useAssets();
     const endWarpTo = useGameStore(s => s.playerTurn.endWarpTo);
     const shipSrc = assets?.assets?.starshipPerspective?.src;
 
     const [hideShip, setHideShip] = useState(false);
+    const [showGameOver, setShowGameOver] = useState(false);
     const [timerId, setTimerId] = useState<number | null>(null);
     const durations = useMemo(() => ({
         shipMs: 2000,
@@ -19,6 +22,7 @@ export function WarpingAnimation({isGameOver}: { isGameOver?: boolean }) {
     }), []);
 
     const handleClickToClose = () => {
+        //if (isGameOver) return; // Prevent manual close during game over
         if (timerId !== null) {
             clearTimeout(timerId);
             setTimerId(null);
@@ -48,6 +52,16 @@ export function WarpingAnimation({isGameOver}: { isGameOver?: boolean }) {
                     from { opacity: 1; }
                     to { opacity: 0; }
                 }
+                @keyframes game-over-zoom {
+                    from {
+                        transform: translate(-50%, -50%) scale(0);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translate(-50%, -50%) scale(1);
+                        opacity: 1;
+                    }
+                }
 
                 .ship-anim {
                     animation-name: ship-move-to-center;
@@ -68,10 +82,15 @@ export function WarpingAnimation({isGameOver}: { isGameOver?: boolean }) {
                     animation: white-out var(--white-out-duration) linear 0ms forwards;
                 }
 
+                .game-over-text {
+                    animation: game-over-zoom 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+                }
+
                 @media (prefers-reduced-motion: reduce) {
                     .ship-anim,
                     .white-in,
-                    .white-out {
+                    .white-out,
+                    .game-over-text {
                         animation: none !important;
                     }
                 }
@@ -116,12 +135,41 @@ export function WarpingAnimation({isGameOver}: { isGameOver?: boolean }) {
                     const name = String(e.animationName || '');
                     if (name.includes('white-in')) {
                         setHideShip(true);
+                        if (isGameOver) {
+                            setShowGameOver(true);
+                        }
                     } else if (name.includes('white-out')) {
-                        setTimerId(setTimeout(() => endWarpTo(), 1500));
+                        if (isGameOver) {
+                            // Navigate to home after 5 seconds
+                            setTimerId(setTimeout(() => navigate('/'), 5000));
+                        } else {
+                            setTimerId(setTimeout(() => endWarpTo(), 1500));
+                        }
                     }
                 }}
                 aria-hidden="true"
             />
+
+            {showGameOver && (
+                <div
+                    className="game-over-text font-orbitron text-center text-gamewhite"
+                    style={{
+                        position: 'fixed',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%) scale(0)',
+                        zIndex: 80,
+                        fontSize: '4rem',
+                        fontWeight: 'bold',
+                        textShadow: '0 0 20px rgba(255, 255, 255, 0.8)',
+                        letterSpacing: '0.2em',
+                        whiteSpace: 'nowrap'
+                    }}
+                >
+                    <div>GAME OVER</div>
+                    <div>YOU WON!!!</div>
+                </div>
+            )}
         </div>
     );
 }
