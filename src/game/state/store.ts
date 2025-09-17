@@ -72,6 +72,9 @@ export type GameStore = {
         gameObjectRotations: { [key:string]: number };
         setGameObjectRotation: (go:GameObject, rotation:number) => void;
         clearGameObjectRotations: () => void;
+        showSelfDestruct: () => void;
+        hideSelfDestruct: () => void;
+        isShowingSelfDestruct: boolean;
     }
     playerTurn: {
         canAddTarget: () => boolean;
@@ -99,6 +102,7 @@ export type GameStore = {
         repair: (time: number) => void;
         dock: () => void;
         undock: () => void;
+        cancelSelfDestruct: () => void;
     },
     enemyTurn: {
         aiActorSequence: string[];
@@ -129,6 +133,7 @@ const userInterfaceDefaults = {
     isShowingSystemStatus: false,
     isShowingLogs: false,
     isShowingMenu: false,
+    isShowingSelfDestruct: false,
     gameObjectRotations: {},
 }
 
@@ -192,6 +197,8 @@ export const useGameStore = create<GameStore>()(
                 hideMenu: () => { set((state) => { state.userInterface.isShowingMenu = false; }); },
                 setGameObjectRotation: (go:GameObject, rotation:number) => { set((state) => { state.userInterface.gameObjectRotations[go.id] = rotation; });},
                 clearGameObjectRotations: () => { set((state) => { state.userInterface.gameObjectRotations = {}; }); },
+                showSelfDestruct: () => { set(state => { state.userInterface.isShowingSelfDestruct = true; })},
+                hideSelfDestruct: () => { set(state => { state.userInterface.isShowingSelfDestruct = false; })},
             },
 
             map: {
@@ -223,7 +230,8 @@ export const useGameStore = create<GameStore>()(
                 nonPrioritisedRepairCosts: () => calculateNonPrioritisedRepairCosts({get}),
                 repair: (time) => repair({get, set}, time),
                 dock: () => dock({get, set}),
-                undock: () => undock({get, set})
+                undock: () => undock({get, set}),
+                cancelSelfDestruct: () => cancelSelfDestruct({get, set})
             },
 
             enemyTurn: {
