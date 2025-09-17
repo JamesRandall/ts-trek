@@ -2,6 +2,7 @@ import type {Enemy} from "./Enemy.ts";
 import type {Starbase} from "./Starbase.ts";
 import type {Player} from "./Player.ts";
 import type {GameObject} from "./gameObject.ts";
+import type {ScoreTracker} from "./scores.ts";
 
 export const GameTurn = {
     PlayerTurn: 'PlayerTurn',
@@ -89,13 +90,6 @@ export type DifficultyConstants = {
     repair: RepairConstants;
     enemyWeaponConstants: EnemyWeaponConstants;
     scoring: ScoringConstants;
-}
-
-export type ScoreTracker = {
-    cubusDestroyed: number;
-    scoutDestroyed: number;
-    warbirdDestroyed: number;
-    finalGameState: GameState | null;
 }
 
 export type GameData = {
