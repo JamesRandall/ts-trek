@@ -9,7 +9,7 @@ import {getGameObjectAsset} from "../../models/gameObject.ts";
 export function ExplosionOverlay({cellSize} : { cellSize: { width: number, height: number} }) {
     const assetManager = useAssets();
     const nextFiringSequenceItem = useGameStore(s => s.playerTurn.nextFiringSequenceItem);
-    const firingItem = useGameStore(s => s.gameData.firingSequence)[0];
+    const firingItem = useGameStore(s => s.gameData.firingSequence[0]);
     const gameData = useGameStore(s => s.gameData); // Get the whole gameData once
     const gameObjectRotations = useGameStore(s => s.userInterface.gameObjectRotations);
     const onCompleteCalledRef = useRef(false);

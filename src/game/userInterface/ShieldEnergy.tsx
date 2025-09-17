@@ -3,6 +3,7 @@ import * as GameConstants from "../gameConstants.ts";
 import {useGameStore} from "../state/store.ts";
 import {useAssets} from "../AssetManager.tsx";
 import React, {useEffect, useRef} from "react";
+import {useLocation} from "react-router-dom";
 
 // Remove the setupHiDpi function - CanvasSurface handles this
 // function setupHiDpi(ctx: CanvasRenderingContext2D) { ... }
@@ -54,6 +55,8 @@ export function ShieldEnergy() {
     const transferAft = useGameStore(state => state.playerTurn.transferEnergyToAftShield);
     const transferPort = useGameStore(state => state.playerTurn.transferEnergyToPortShield);
     const isInitialRender = useRef(true);
+    const location = useLocation();
+
 
     const assets = useAssets();
 
@@ -62,6 +65,11 @@ export function ShieldEnergy() {
         // playing - but it does in prod!
         if (isInitialRender.current) {
             isInitialRender.current = false;
+            return;
+        }
+
+        // Only play sound if we're on the /game route
+        if (location.pathname !== '/game') {
             return;
         }
 

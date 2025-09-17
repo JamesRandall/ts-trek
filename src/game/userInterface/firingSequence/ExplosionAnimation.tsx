@@ -13,8 +13,8 @@ type Props = {
 
 export function ExplosionAnimation({image, sector, cellSize, onComplete, onStart, rotation} : Props) {
     const managerRef = useRef<ReturnType<typeof makeExplosionManager> | null>(null);
-    const rotatedImageRef = useRef<HTMLImageElement | null>(null);
     const explosionTriggeredRef = useRef<boolean>(false);
+    const pendingExplosionRef = useRef<{ state: any } | null>(null);
 
     // Function to create a rotated image synchronously
     const createRotatedImage = (sourceImage: HTMLImageElement, rotationDegrees: number): HTMLImageElement => {
@@ -49,19 +49,46 @@ export function ExplosionAnimation({image, sector, cellSize, onComplete, onStart
         return rotatedImage;
     };
 
+    // Get the final image synchronously
+    const finalImage = rotation !== undefined && rotation !== 0 
+        ? createRotatedImage(image, rotation) 
+        : image;
+
+    // Function to trigger explosion
+    const triggerExplosion = (state: any) => {
+        if (!explosionTriggeredRef.current && managerRef.current) {
+            explosionTriggeredRef.current = true;
+            onStart?.();
+            managerRef.current.trigger(
+                finalImage,
+                { x: sector.x * cellSize.width, y: sector.y * cellSize.height, w: cellSize.width, h: cellSize.height },
+                state.timestamp,
+                44,
+                2000,
+                undefined,
+                {
+                    shockRing: {
+                        enabled: true,
+                        color: "#FFFFFF",
+                        width: 2,
+                        durationMs: 520,
+                        startDelayMs: 30,
+                        maxRadius: cellSize.width * 1.333,
+                        dash: [10, 10],
+                        easing: t => easeOutQuad(t),
+                        fade:  t => 1 - t,
+                    }
+                },
+                onComplete,
+            );
+        }
+    };
+
     // Reset the triggered flag when sector changes (new explosion)
     useEffect(() => {
         explosionTriggeredRef.current = false;
+        pendingExplosionRef.current = null;
     }, [sector.x, sector.y]);
-
-    // Prepare the rotated image when image or rotation changes
-    useEffect(() => {
-        if (rotation !== undefined && rotation !== 0) {
-            rotatedImageRef.current = createRotatedImage(image, rotation);
-        } else {
-            rotatedImageRef.current = image;
-        }
-    }, [image, rotation]);
 
     return (<CanvasSurface
         onInit={(_, state) => {
@@ -69,33 +96,8 @@ export function ExplosionAnimation({image, sector, cellSize, onComplete, onStart
                 managerRef.current = makeExplosionManager();
             }
 
-            // Only trigger explosion once per sector position
-            if (!explosionTriggeredRef.current && rotatedImageRef.current) {
-                explosionTriggeredRef.current = true;
-                onStart?.();
-                managerRef.current?.trigger(
-                    rotatedImageRef.current,
-                    { x: sector.x * cellSize.width, y: sector.y * cellSize.height, w: cellSize.width, h: cellSize.height },
-                    state.timestamp,
-                    44,
-                    2000,
-                    undefined,
-                    {
-                        shockRing: {
-                            enabled: true,
-                            color: "#FFFFFF",
-                            width: 2,
-                            durationMs: 520,
-                            startDelayMs: 30,
-                            maxRadius: cellSize.width * 1.333,
-                            dash: [10, 10],
-                            easing: t => easeOutQuad(t),
-                            fade:  t => 1 - t,
-                        }
-                    },
-                    onComplete,
-                );
-            }
+            // Trigger explosion immediately since we have the image ready
+            triggerExplosion(state);
         }}
         onRender={(ctx, state) => {
             ctx.clearRect(0, 0, state.width, state.height);
