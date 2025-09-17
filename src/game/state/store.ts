@@ -167,7 +167,7 @@ export const useGameStore = create<GameStore>()(
             // Game
             startGame: () => {
                 set((state) => {
-                    state.gameData = createNewLateGame(); //createNewGame();
+                    state.gameData = createNewGame();
                     state.userInterface = { ...state.userInterface, ...userInterfaceDefaults };
                     state.playerTurn = { ...state.playerTurn, ...playerTurnDefaults };
                     state.enemyTurn = { ...state.enemyTurn, ...enemyTurnDefaults };
