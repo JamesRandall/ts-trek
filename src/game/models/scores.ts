@@ -1,4 +1,4 @@
-import {GameState, type ScoreTracker, type ScoringConstants} from "./gameData.ts";
+import {GameState, type ScoringConstants} from "./gameData.ts";
 
 export type ScoreTracker = {
     cubusDestroyed: number;
