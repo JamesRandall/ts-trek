@@ -15,7 +15,7 @@ import {
     energy,
     transferEnergyToAftShield,
     transferEnergyToForeShield, transferEnergyToPortShield,
-    transferEnergyToStarboardShield
+    transferEnergyToStarboardShield, transferShieldEnergyToMain
 } from "../actions/playerTurn/energy.ts";
 import {objectsInQuadrant} from "../actions/map.ts";
 import {beginWarpTo, canWarpTo, endWarpTo, setWarpSpeed} from "../actions/playerTurn/warpTo.ts";
@@ -93,6 +93,7 @@ export type GameStore = {
         transferEnergyToAftShield: () => void;
         transferEnergyToStarboardShield: () => void;
         transferEnergyToPortShield: () => void;
+        transferShieldEnergyToMain: () => void;
         beginWarpTo: () => void;
         endWarpTo: () => void;
         canWarpTo: (quadrant: {x:number, y:number}) => boolean;
@@ -136,7 +137,7 @@ const userInterfaceDefaults = {
     isShowingSystemStatus: false,
     isShowingLogs: false,
     isShowingMenu: false,
-    isShowingSelfDestruct: false,
+    isShowingStartSelfDestruct: false,
     gameObjectRotations: {},
 }
 
@@ -223,6 +224,7 @@ export const useGameStore = create<GameStore>()(
                 transferEnergyToAftShield: () => transferEnergyToAftShield({get,set}),
                 transferEnergyToStarboardShield: () => transferEnergyToStarboardShield({get,set}),
                 transferEnergyToPortShield: () => transferEnergyToPortShield({get,set}),
+                transferShieldEnergyToMain: () => transferShieldEnergyToMain({get,set}),
                 setTargetQuadrant: (quadrant:{x:number, y:number}) => set((state) => {state.gameData.player.attributes.targetQuadrant = {...quadrant}}),
                 beginWarpTo: () => beginWarpTo({get,set}),
                 endWarpTo: () => endWarpTo({get,set}),

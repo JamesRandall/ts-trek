@@ -13,6 +13,7 @@ export default function SidePanel() {
     const playerEnergy = useGameStore(s => s.gameData.player.attributes.energy);
     const isDisabled = useGameStore(s => s.userInterface.isDisabled);
     const equalizeShieldEnergy = useGameStore(s => s.playerTurn.equalizeShieldEnergy);
+    const transferShieldEnergyToMain = useGameStore(state => state.playerTurn.transferShieldEnergyToMain);
     const [weaponsMode, setWeaponsMode] = useState<"phasers" | "torpedoes">("phasers");
 
     return (
@@ -41,7 +42,7 @@ export default function SidePanel() {
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-2">
-                        <GameButton title="TRANSFER" disabled={isDisabled} />
+                        <GameButton title="TRANSFER" disabled={isDisabled} onClick={() => transferShieldEnergyToMain()} />
                         <GameButton title="EQUALIZE" disabled={isDisabled} onClick={() => equalizeShieldEnergy()} />
                     </div>
                 </div>
