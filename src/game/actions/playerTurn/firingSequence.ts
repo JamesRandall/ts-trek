@@ -60,14 +60,16 @@ function applyPhaserHitToEnemy(constants: PlayerWeaponConstants, state:GameStore
 }
 
 function applyTorpedoHitToEnemy(constants: PlayerWeaponConstants, state:GameStore, target: Enemy) {
+    const player = state.gameData.player;
+    // Reduce players torpedo count
+    applyDeltaToRangedValue(player.attributes.weapons.torpedoes, -1);
+
     const isSensorImpaired = state.gameData.sensorImpactedGameObjectIds.includes(target.id);
     const didMiss = Math.random() < (isSensorImpaired ? constants.percentageChanceOfMissWhenTargetSensorImpaired : constants.percentageChanceOfMiss);
     if (didMiss) {
         gameLog(state, GameLogLevel.Red, "Sensor malfunction caused torpedo to miss target");
         return false;
     }
-
-    const player = state.gameData.player;
 
     const shieldDamage = constants.torpedoDamage * constants.torpedoOnShieldsMultiplier;
     const newEnemyShields = Math.max(0, target.attributes.shields.currentValue - shieldDamage);
@@ -80,9 +82,6 @@ function applyTorpedoHitToEnemy(constants: PlayerWeaponConstants, state:GameStor
     }
     target.attributes.shields.currentValue = newEnemyShields;
     target.attributes.hull.currentValue = newEnemyHull;
-
-    // Reduce players torpedo count
-    applyDeltaToRangedValue(player.attributes.weapons.torpedoes, -1);
 
     return target.attributes.hull.currentValue <= 0;
 }
@@ -108,7 +107,8 @@ export function nextFiringSequenceItem({get,set} : ContextAccessor) {
         if (head.type === FiringSequenceActionType.Destroyed) {
             const enemy = state.gameData.enemies.find(e => e.id === head.targetId);
             state.gameData.enemies = state.gameData.enemies.filter(e => e.id !== head.targetId);
-            state.gameData.player.attributes.weapons.targetGameObjectIds = state.gameData.player.attributes.weapons.targetGameObjectIds.filter(t => t !== head.targetId);
+            state.gameData.player.attributes.weapons.targetGameObjectIds =
+                state.gameData.player.attributes.weapons.targetGameObjectIds.filter(t => t !== head.targetId);
             if (enemy) {
                 updateScoreBasedOnEnemyDestroyed(state, enemy);
             }

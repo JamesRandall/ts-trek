@@ -23,6 +23,7 @@ function Main() {
                 <MenuButton title={"ABOUT"} onClick={() => navigate('/about')} disabled={assets.isLoading} />
             </div>
         </div>
+        <div className="absolute text-gamewhite font-orbitron text-sm right-3 bottom-3">v1.00</div>
     </div>);
 }
 
