@@ -5,6 +5,7 @@ import {endTurn} from "./endTurn.ts";
 import {objectsInQuadrant} from "../map.ts";
 import {GameObjectType} from "../../models/gameObject.ts";
 import type {RepairConstants} from "../../models/gameData.ts";
+import {applySensorDamage} from "./sensors.ts";
 
 function calculateDailyRepairPoints(constants: RepairConstants, isDocked: boolean, crew: RangedValue) {
     const availableCrew = crew.currentValue;
@@ -127,4 +128,21 @@ export function repair(stateAccess: ContextAccessor | GameStore, time: number) {
 export function updateCanRepair(state:GameStore) {
     const enemiesInQuadrant = objectsInQuadrant(state.gameData).filter(go => go.type === GameObjectType.Enemy);
     state.gameData.canRepair = enemiesInQuadrant.length === 0;
+}
+
+export function setPercentageHealth({set}: ContextAccessor, systemKey: string, percentageHealth: number) {
+    set(state => {
+        const system =
+            Object
+                .entries(state.gameData.player.attributes.systems)
+                .filter(([k]) => k === systemKey)
+                .map(([,v]) => v)[0];
+        if (system) {
+            system.status.currentValue = system.status.maxValue * percentageHealth;
+            if (systemKey === 'sensors') {
+                applySensorDamage(state);
+            }
+        }
+    });
+
 }

@@ -12,9 +12,11 @@ export default function SelfDestructAnimation() {
     const cancelSelfDestruct = useGameStore(s => s.playerTurn.cancelSelfDestruct);
 
     useEffect(() => {
+        assetManager?.assets?.sounds.beep();
         const interval = setInterval(() => {
             setCurrentCounter(c => {
                 if (c > 0) {
+                    assetManager?.assets?.sounds.beep();
                     return c - 1;
                 }
                 return c;
@@ -28,6 +30,7 @@ export default function SelfDestructAnimation() {
         if (currentCounter === 0) {
             // Flash rapidly for 3 seconds (150ms intervals)
             const flashInterval = setInterval(() => {
+                assetManager?.assets?.sounds.beep();
                 setFlashColor(prev => prev === "text-red-600" ? "text-gray-900" : "text-red-600");
             }, 150);
             

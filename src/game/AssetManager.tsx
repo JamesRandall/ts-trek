@@ -12,6 +12,7 @@ import shieldsRaised from '../assets/sounds/Shields Being Raised.mp3';
 import shieldsLowered from '../assets/sounds/Shields Being Lowered.mp3';
 import torpedoFired from '../assets/sounds/Torpedo Being Fired.mp3';
 import bigExplosion from '../assets/sounds/Big Explosion.mp3';
+import beep from '../assets/sounds/Beep.mp3'
 import {createContext, type ReactNode, useContext, useEffect, useState} from "react";
 
 interface AssetProviderProps {
@@ -50,6 +51,7 @@ export type AssetManager = {
         enemyLaser: (options?:AudioOptions) => void;
         torpedo: (options?:AudioOptions) => void;
         bigExplosion: (options?:AudioOptions) => void;
+        beep: (options?:AudioOptions) => void;
     }
 }
 
@@ -113,7 +115,8 @@ function loadAssets() : Promise<AssetManager> {
         shieldsLowered,
         enemyLaser,
         torpedoFired,
-        bigExplosion
+        bigExplosion,
+        beep
     ];
 
     const loadedImagePromises = srcImages.map(srcImage => {
@@ -162,6 +165,7 @@ function loadAssets() : Promise<AssetManager> {
                 enemyLaser: (options) => playAudioBuffer(loadedAssets[11] as AudioBuffer, ctx, options),
                 torpedo: (options) => playAudioBuffer(loadedAssets[12] as AudioBuffer, ctx, options),
                 bigExplosion: (options) => playAudioBuffer(loadedAssets[13] as AudioBuffer, ctx, options),
+                beep: (options) => playAudioBuffer(loadedAssets[14] as AudioBuffer, ctx, options),
             }
         } as AssetManager;
     });

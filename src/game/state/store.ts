@@ -25,7 +25,7 @@ import {applyPhasersToPlayer} from "../actions/enemyTurn/phasers.ts";
 import {
     calculateNonPrioritisedRepairCosts,
     calculatePrioritisedRepairCosts,
-    repair,
+    repair, setPercentageHealth,
     togglePrioritisedSystem
 } from "../actions/playerTurn/repair.ts";
 import {patchRangedValues} from "../models/RangedValue.ts";
@@ -107,6 +107,7 @@ export type GameStore = {
         cancelSelfDestruct: () => void;
         startSelfDestruct: () => void;
         completeSelfDestruct: () => void;
+        setPercentageHealth: (systemKey:string,percentage:number) => void;
     },
     enemyTurn: {
         aiActorSequence: string[];
@@ -239,6 +240,7 @@ export const useGameStore = create<GameStore>()(
                 cancelSelfDestruct: () => cancelSelfDestruct({get, set}),
                 startSelfDestruct: () => startSelfDestruct({get, set}),
                 completeSelfDestruct: () => completeSelfDestruct({get, set}),
+                setPercentageHealth: (systemKey,percentage) => setPercentageHealth({get, set}, systemKey, percentage),
             },
 
             enemyTurn: {

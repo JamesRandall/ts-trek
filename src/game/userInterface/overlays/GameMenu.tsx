@@ -1,6 +1,6 @@
 import GameButton from "../../../components/GameButton.tsx";
 import {OverlayPanel} from "../../../components/OverlayPanel.tsx";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useSearchParams} from "react-router-dom";
 import {useGameStore} from "../../state/store.ts";
 import {GameState} from "../../models/gameData.ts";
 import {calculateScores} from "../../models/scores.ts";
@@ -12,10 +12,13 @@ export function GameMenu() {
     const scores = useGameStore(s => s.gameData.scoreTracker);
     const startingStardate = useGameStore(s => s.gameData.startingStardate);
     const currentStardate = useGameStore(s => s.gameData.stardate);
+    const setPercentageHealth = useGameStore(s => s.playerTurn.setPercentageHealth);
+    const [searchParams] = useSearchParams();
+    const isDebugMode = searchParams.has('debugMode');
     const calculatedScores = calculateScores(scores, constants, startingStardate, currentStardate);
 
     return (<OverlayPanel borderColor="green-600" onClick={e => e.stopPropagation()}>
-        <div className="p-3 flex flex-col font-orbitron gap-5">
+        <div className="p-3 flex flex-col font-orbitron gap-3">
             <div className="grid grid-cols-2 gap-3">
                 <div className="text-green-600">Scouts destroyed</div>
                 <div className="text-green-600 text-right">{calculatedScores.scoutDestroyed}</div>
@@ -33,6 +36,10 @@ export function GameMenu() {
             <div className="flex flex-col">
                 <GameButton title="BACK TO TITLE SCREEN" onClick={() => navigate('/')} />
             </div>
+            {isDebugMode && <>
+                <GameButton color="yellow-600" title="SET SENSOR STATUS TO 40%" onClick={() => setPercentageHealth('sensors', 0.4)} />
+                <GameButton color="yellow-600" title="SET SENSOR STATUS TO 15%" onClick={() => setPercentageHealth('sensors', 0.15)} />
+            </>}
         </div>
 
     </OverlayPanel>);

@@ -62,6 +62,8 @@ export type PlayerWeaponConstants = {
     torpedoOnShieldsMultiplier: number;
     torpedoOnHullMultiplier: number;
     torpedoDamage: number;
+    percentageChanceOfMiss: number;
+    percentageChanceOfMissWhenTargetSensorImpaired: number;
 }
 
 export type RepairConstants = {

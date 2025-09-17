@@ -1,34 +1,50 @@
 import type {ContextAccessor, GameStore} from "../../state/store.ts";
 import {type Enemy, EnemyType} from "../../models/Enemy.ts";
-import type {Player} from "../../models/Player.ts";
-import {FiringSequenceActionType, GameTurn, type PlayerWeaponConstants} from "../../models/gameData.ts";
+import {
+    FiringSequenceActionType,
+    GameLogLevel,
+    GameTurn,
+    type PlayerWeaponConstants
+} from "../../models/gameData.ts";
 import {endTurn} from "./endTurn.ts";
 import {verifyState} from "../verifyState.ts";
 import {passTime} from "./time.ts";
 import * as GameConstants from "../../gameConstants.ts";
 import {applyDeltaToRangedValue} from "../../models/RangedValue.ts";
+import {gameLog} from "../logs.ts";
 
-function applyPhaserHitToEnemy(constants: PlayerWeaponConstants, player: Player, target: Enemy) {
-    const phaserPower = Math.min(player.attributes.weapons.laserPower.currentValue, player.attributes.energy.currentValue);
+function applyPhaserHitToEnemy(constants: PlayerWeaponConstants, state:GameStore, target: Enemy) {
 
-    // Apply damage to shields first
-    const shieldDamage = phaserPower * constants.phaserOnShieldsMultiplier;
-    const newEnemyShields = Math.max(0, target.attributes.shields.currentValue - shieldDamage);
 
-    // Calculate remaining energy after shield damage
-    const shieldDamageDealt = target.attributes.shields.currentValue - newEnemyShields;
-    const remainingEnergy = phaserPower - (shieldDamageDealt / constants.phaserOnShieldsMultiplier);
-
-    // Apply remaining energy to hull if any
-    let newEnemyHull = target.attributes.hull.currentValue;
-    if (remainingEnergy > 0) {
-        const hullDamage = remainingEnergy * constants.phaserOnHullMultiplier;
-        newEnemyHull = Math.max(0, target.attributes.hull.currentValue - hullDamage);
+    const isSensorImpaired = state.gameData.sensorImpactedGameObjectIds.includes(target.id);
+    const didMiss = Math.random() < (isSensorImpaired ? constants.percentageChanceOfMissWhenTargetSensorImpaired : constants.percentageChanceOfMiss);
+    if (didMiss) {
+        gameLog(state, GameLogLevel.Red, "Sensor malfunction caused phaser to miss target");
     }
 
-    // Update the target's attributes
-    target.attributes.shields.currentValue = newEnemyShields;
-    target.attributes.hull.currentValue = newEnemyHull;
+    const player = state.gameData.player;
+    const phaserPower = Math.min(player.attributes.weapons.laserPower.currentValue, player.attributes.energy.currentValue);
+
+    if (!didMiss) {
+        // Apply damage to shields first
+        const shieldDamage = phaserPower * constants.phaserOnShieldsMultiplier;
+        const newEnemyShields = Math.max(0, target.attributes.shields.currentValue - shieldDamage);
+
+        // Calculate remaining energy after shield damage
+        const shieldDamageDealt = target.attributes.shields.currentValue - newEnemyShields;
+        const remainingEnergy = phaserPower - (shieldDamageDealt / constants.phaserOnShieldsMultiplier);
+
+        // Apply remaining energy to hull if any
+        let newEnemyHull = target.attributes.hull.currentValue;
+        if (remainingEnergy > 0) {
+            const hullDamage = remainingEnergy * constants.phaserOnHullMultiplier;
+            newEnemyHull = Math.max(0, target.attributes.hull.currentValue - hullDamage);
+        }
+
+        // Update the target's attributes
+        target.attributes.shields.currentValue = newEnemyShields;
+        target.attributes.hull.currentValue = newEnemyHull;
+    }
 
     // Reduce player's energy by the amount used
     player.attributes.energy.currentValue -= phaserPower;
@@ -43,7 +59,16 @@ function applyPhaserHitToEnemy(constants: PlayerWeaponConstants, player: Player,
     return target.attributes.hull.currentValue <= 0;
 }
 
-function applyTorpedoHitToEnemy(constants: PlayerWeaponConstants, player: Player, target: Enemy) {
+function applyTorpedoHitToEnemy(constants: PlayerWeaponConstants, state:GameStore, target: Enemy) {
+    const isSensorImpaired = state.gameData.sensorImpactedGameObjectIds.includes(target.id);
+    const didMiss = Math.random() < (isSensorImpaired ? constants.percentageChanceOfMissWhenTargetSensorImpaired : constants.percentageChanceOfMiss);
+    if (didMiss) {
+        gameLog(state, GameLogLevel.Red, "Sensor malfunction caused torpedo to miss target");
+        return false;
+    }
+
+    const player = state.gameData.player;
+
     const shieldDamage = constants.torpedoDamage * constants.torpedoOnShieldsMultiplier;
     const newEnemyShields = Math.max(0, target.attributes.shields.currentValue - shieldDamage);
     const shieldDamageDealt = target.attributes.shields.currentValue - newEnemyShields;
@@ -91,7 +116,7 @@ export function nextFiringSequenceItem({get,set} : ContextAccessor) {
         else if (head.type === FiringSequenceActionType.Phasers) {
             const enemy = state.gameData.enemies.find(e => e.id === head.targetId);
             if (enemy) {
-                const isEnemyDestroyed = applyPhaserHitToEnemy(constants, state.gameData.player, enemy);
+                const isEnemyDestroyed = applyPhaserHitToEnemy(constants, state, enemy);
                 if (isEnemyDestroyed) {
                     state.gameData.firingSequence[0].type = FiringSequenceActionType.Destroyed;
                     return;
@@ -101,7 +126,7 @@ export function nextFiringSequenceItem({get,set} : ContextAccessor) {
         else if (head.type === FiringSequenceActionType.Torpedoes) {
             const enemy = state.gameData.enemies.find(e => e.id === head.targetId);
             if (enemy) {
-                const isEnemyDestroyed = applyTorpedoHitToEnemy(constants, state.gameData.player, enemy);
+                const isEnemyDestroyed = applyTorpedoHitToEnemy(constants, state, enemy);
                 if (isEnemyDestroyed) {
                     state.gameData.firingSequence[0].type = FiringSequenceActionType.Destroyed;
                     return;

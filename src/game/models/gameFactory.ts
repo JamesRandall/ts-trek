@@ -26,7 +26,9 @@ const normalDifficultyConstants : DifficultyConstants = {
         phaserPowerTemperatureMultiplier: 0.7,
         torpedoOnShieldsMultiplier: 0.2,
         torpedoOnHullMultiplier: 1,
-        torpedoDamage: 800
+        torpedoDamage: 800,
+        percentageChanceOfMiss: 0.1,
+        percentageChanceOfMissWhenTargetSensorImpaired: 0.6
     },
     repair: {
         percentageOfMaxCrewCanUndertakeRepairs: 0.25,
