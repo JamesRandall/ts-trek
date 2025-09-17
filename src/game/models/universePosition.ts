@@ -1,5 +1,5 @@
 import * as GameConstants from '../gameConstants.ts';
-import type {GameObjectType} from "./gameObject.ts";
+import type {GameObject, GameObjectType} from "./gameObject.ts";
 
 export type UniversePosition = {
     quadrant: { x: number; y: number };
@@ -38,9 +38,13 @@ export function getRandomQuadrantPosition() {
     }
 }
 
-export function uniqueRandomPositionFactory() {
+export function uniqueRandomPositionFactory(existingObjects: GameObject[] = []) {
     const usedPositions = new Map<string,GameObjectType>();
     const getPositionKey = (p:UniversePosition) => `${p.quadrant.x}_${p.quadrant.y}_${p.sector.x}_${p.sector.y}_${p.sector.y}`;
+
+    existingObjects.forEach(obj => {
+        usedPositions.set(getPositionKey(obj.position), obj.type);
+    });
 
     const getUniqueRandomPosition = (gameObjectType:GameObjectType, shouldStore:boolean = true) => {
         let position = { quadrant: { x: -1, y: -1}, sector: { x: -1, y: -1 } };

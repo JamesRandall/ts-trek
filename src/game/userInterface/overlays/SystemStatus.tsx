@@ -54,7 +54,7 @@ export function SystemStatus() {
                                 <div className="text-yellow-300 text-right">{renderProps.timeToRepairNonPrioritisedSystems.toFixed(1)} days</div>
                             </div>
                         </div>
-                        <GameButton color="amber-600" title="Repair prioritised" disabled={renderProps.timeToRepairPrioritisedSystems <= 0 || !canRepair}></GameButton>
+                        <GameButton color="amber-600" title="Repair prioritised" disabled={renderProps.timeToRepairPrioritisedSystems <= 0 || !canRepair} onClick={() => repair(renderProps.timeToRepairPrioritisedSystems)}></GameButton>
                         <GameButton color="yellow-300" disabled={!canRepair} onClick={() => repair(renderProps.timeToRepairAllSystems)}>
                             <div className="flex flex-row justify-center items-center gap-2">
                                 <div>Repair all</div>

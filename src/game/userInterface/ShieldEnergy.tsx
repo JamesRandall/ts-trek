@@ -58,6 +58,8 @@ export function ShieldEnergy() {
     const assets = useAssets();
 
     useEffect(() => {
+        // if we're in strict mode the double rendering will cause this to seem not to prevent the shield sound from
+        // playing - but it does in prod!
         if (isInitialRender.current) {
             isInitialRender.current = false;
             return;
@@ -68,7 +70,7 @@ export function ShieldEnergy() {
         } else {
             assets.assets?.sounds.shieldsLowered();
         }
-    }, [shieldEnergies.raised]);
+    }, [assets.assets?.sounds, shieldEnergies.raised]);
 
     const handlePointerDown: React.PointerEventHandler<HTMLDivElement> = (e) => {
         if (isDisabled) return;

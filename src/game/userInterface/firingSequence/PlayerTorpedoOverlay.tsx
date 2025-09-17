@@ -16,7 +16,7 @@ export function PlayerTorpedoOverlay({cellSize} : { cellSize: { width: number, h
 
     useEffect(() => {
         if (!firingItem || firingItem.type !== FiringSequenceActionType.Torpedoes || !targetObject) return;
-        assets?.assets?.sounds.playerLaser();
+        assets?.assets?.sounds.torpedo();
     }, [assets?.assets?.sounds, firingItem, targetObject]);
 
     if (!firingItem || firingItem.type !== FiringSequenceActionType.Torpedoes || !targetObject) return undefined;

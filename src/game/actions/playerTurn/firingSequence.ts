@@ -96,7 +96,9 @@ export function nextFiringSequenceItem({get,set} : ContextAccessor) {
             }
         }
 
-        state.gameData.firingSequence = state.gameData.firingSequence.slice(1);
+        // We need to remove the head from the sequence - but we also need to remove any destroyed targets (which
+        // will be more instances of the head target, if multiple targets were added)
+        state.gameData.firingSequence = state.gameData.firingSequence.slice(1).filter(f => f.targetId !== head.targetId || head.type !== FiringSequenceActionType.Destroyed);
         if (state.gameData.firingSequence.length === 0) {
             passTime(state, 0.1);
             endTurn(state);

@@ -84,3 +84,24 @@ export function createNewGame() : GameData {
         canDock: true
     };
 }
+
+export function createNewLateGame() : GameData {
+    const game = createNewGame();
+    const { getUniqueRandomPosition } = uniqueRandomPositionFactory(
+        [...game.stars, ...game.enemies, ...game.starbases, game.player]
+    );
+    return {
+        ...game,
+        enemies: [
+            createScout(getUniqueRandomPosition(GameObjectType.Enemy)),
+            createWarbird(getUniqueRandomPosition(GameObjectType.Enemy)),
+            createCube(getUniqueRandomPosition(GameObjectType.Enemy))
+        ],
+        quadrantMapped:
+            range(0, GameConstants.Map.quadrantSize.height-1).map(() =>
+                range(0, GameConstants.Map.quadrantSize.width-1).map(() =>
+                    true
+                )
+            )
+    };
+}

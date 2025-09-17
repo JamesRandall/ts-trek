@@ -1,7 +1,7 @@
 import {create} from "zustand";
 import {devtools, persist} from "zustand/middleware";
 import {immer} from "zustand/middleware/immer";
-import {createNewGame} from "../models/gameFactory.ts";
+import {createNewGame, createNewLateGame} from "../models/gameFactory.ts";
 import {FiringSequenceActionType, type GameData, GameState} from "../models/gameData.ts";
 import {toggleShieldStatus} from "../actions/playerTurn/toggleShieldStatus.ts";
 import {impulseTo} from "../actions/playerTurn/impulseTo.ts";
@@ -157,7 +157,7 @@ export const useGameStore = create<GameStore>()(
             // Game
             startGame: () => {
                 set((state) => {
-                    state.gameData = createNewGame();
+                    state.gameData = createNewLateGame(); //createNewGame();
                     state.userInterface = { ...state.userInterface, ...userInterfaceDefaults };
                     state.playerTurn = { ...state.playerTurn, ...playerTurnDefaults };
                     state.enemyTurn = { ...state.enemyTurn, ...enemyTurnDefaults };
